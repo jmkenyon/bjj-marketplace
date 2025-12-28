@@ -78,7 +78,7 @@ export const SignInView = () => {
                 <span
                   className={cn("text-2xl font-sefmibold", poppins.className)}
                 >
-                  Formara
+                  BJJ Desk
                 </span>
               </Link>
               <Button
@@ -129,7 +129,7 @@ export const SignInView = () => {
               type="submit"
               size="lg"
               variant="elevated"
-              className="bg-black text-white hover:bg-pink-400 hover:text-black mt-4"
+              className="bg-black text-white hover:bg-blue-600 hover:text-black mt-4"
             >
               Log in
             </Button>
@@ -139,7 +139,7 @@ export const SignInView = () => {
       <div
         className="h-screen w-full lg:col-span-2 hidden lg:block"
         style={{
-          backgroundImage: "url('/background.png')",
+          backgroundImage: "url('/background.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}

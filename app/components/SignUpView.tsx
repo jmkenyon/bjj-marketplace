@@ -1,5 +1,5 @@
 "use client";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import {  SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Input } from "@/components/ui/input";
@@ -15,16 +15,17 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import z from "zod";
-import { registerSchema } from "../schemas/schemas";
+
+import { RegisterInput, registerSchema } from "../schemas/schemas";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+
 import axios from "axios";
 import { signIn } from "next-auth/react";
 import toast from "react-hot-toast";
 import { useWatch } from "react-hook-form";
+import { slugifyGymName } from "../lib/slugify";
 
 
 
@@ -34,58 +35,59 @@ const poppins = Poppins({ subsets: ["latin"], weight: ["700"] });
 
 export const SignUpView = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter()
 
 
-  const form = useForm<z.infer<typeof registerSchema>>({
-    mode: "all",
+
+  const form = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
       email: "",
       password: "",
-      username: "",
+      gymName: "",
     },
   });
 
 
-
-  const onSubmit: SubmitHandler<FieldValues> = (data) => {
-    setIsLoading(true)
-    axios
-      .post("/api/register", data)
-      .then(() => {
-        signIn("credentials", {
-          username: data.username,
-          email: data.email,
-          password: data.password,
-          redirect: false, 
-        }).then((response) => {
-          setIsLoading(false);
-          if (response?.ok) {
-            toast.success("Account created succesfully");
-          }
-        });
-      })
-      .catch((error) => {
-        toast.error(error?.response?.data?.error || "Something went wrong");
-        if (error.response.status === 409) {
-          router.push("/login")
-        }
-        setIsLoading(false);
+  const onSubmit: SubmitHandler<RegisterInput> = async (data) => {
+    setIsLoading(true);
+  
+    const gymSlug = slugifyGymName(data.gymName);
+  
+    try {
+      await axios.post("/api/register", {
+        ...data,
+        gymSlug,
       });
+  
+      await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      });
+  
+      toast.success("Account created successfully");
+    } catch (error) {
+      console.log(error)
+      toast.error("Something went wrong");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
 
-  const username = useWatch({
+  const gymName = useWatch({
     control: form.control,
-    name: "username",
+    name: "gymName",
   });
-  const usernameEror = form.formState.errors.username;
+  
+  const gymSlug = gymName ? slugifyGymName(gymName) : "";
 
-  const showPreview = username && !usernameEror;
+  const gymNameEror = form.formState.errors.gymName;
+
+  const showPreview = gymName && !gymNameEror;
 
   return (
-    <div className="">
+    <div className="grid grid-cols-1 lg:grid-cols-5">
       <div className="bg-[#F4F4F0] h-screen w-full lg:col-span-3 overflow-y-auto">
         <Form {...form}>
           <form
@@ -116,7 +118,7 @@ export const SignUpView = () => {
             </h1>
             <FormField
               control={form.control}
-              name="username"
+              name="gymName"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Gym name</FormLabel>
@@ -126,8 +128,8 @@ export const SignUpView = () => {
                   <FormDescription
                     className={cn("hidden", showPreview && "block")}
                   >
-                    Your gym will be available at&nbsp;
-                    <strong>{username}</strong>.bjjdesk.com
+                     Your gym will be available at{" "}
+                     <strong>{gymSlug}.bjjdesk.com</strong>
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -176,7 +178,7 @@ export const SignUpView = () => {
       <div
         className="h-screen w-full lg:col-span-2 hidden lg:block"
         style={{
-          backgroundImage: "url('/background.png')",
+          backgroundImage: "url('/free-trial-background.webp')",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}

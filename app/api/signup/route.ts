@@ -1,45 +1,43 @@
 import bcrypt from "bcrypt";
-import prisma from "@/app/lib/prisma"
+import prisma from "@/app/lib/prisma";
 import { NextResponse } from "next/server";
+import { slugifyGymName } from "@/app/lib/slugify";
 
+export async function POST(req: Request) {
+  const { email, password, gymName } = await req.json();
 
-export async function POST(request: Request) {
-  const { username, email, password } = await request.json();
-
-  if (!email || !password) {
-    return NextResponse.json(
-      { error: "Missing fields" },
-      { status: 400 }
-    );
+  if (!email || !password || !gymName) {
+    return NextResponse.json({ error: "Missing fields" }, { status: 400 });
   }
 
-  const existingUser = await prisma.user.findUnique({
-    where: { email },
+  const finalSlug = slugifyGymName(gymName);
+
+  const existingGym = await prisma.gym.findUnique({
+    where: { slug: finalSlug },
   });
 
-  if (existingUser) {
+  if (existingGym) {
     return NextResponse.json(
-      { error: "Email already in use" },
+      { error: "Gym URL already taken" },
       { status: 409 }
     );
   }
 
   const hashedPassword = await bcrypt.hash(password, 12);
 
-  const user = await prisma.user.create({
+  await prisma.gym.create({
     data: {
-      username,
-      email,
-      hashedPassword,
+      name: gymName,
+      slug: finalSlug,
+      users: {
+        create: {
+          email,
+          hashedPassword,
+          role: "ADMIN",
+        },
+      },
     },
   });
 
-  return NextResponse.json(
-    {
-      id: user.id,
-      email: user.email,
-      username: user.username,
-    },
-    { status: 201 }
-  );
+  return NextResponse.json({ success: true }, { status: 201 });
 }
