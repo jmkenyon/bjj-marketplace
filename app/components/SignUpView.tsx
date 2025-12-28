@@ -1,5 +1,5 @@
 "use client";
-import {  SubmitHandler, useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Input } from "@/components/ui/input";
@@ -26,9 +26,7 @@ import { signIn } from "next-auth/react";
 import toast from "react-hot-toast";
 import { useWatch } from "react-hook-form";
 import { slugifyGymName } from "../lib/slugify";
-
-
-
+import { useRouter } from "next/navigation";
 
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["700"] });
@@ -36,7 +34,7 @@ const poppins = Poppins({ subsets: ["latin"], weight: ["700"] });
 export const SignUpView = () => {
   const [isLoading, setIsLoading] = useState(false);
 
-
+  const router = useRouter()
 
   const form = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
@@ -47,39 +45,38 @@ export const SignUpView = () => {
     },
   });
 
-
   const onSubmit: SubmitHandler<RegisterInput> = async (data) => {
     setIsLoading(true);
-  
+
     const gymSlug = slugifyGymName(data.gymName);
-  
+
     try {
       await axios.post("/api/register", {
         ...data,
         gymSlug,
       });
-  
+
       await signIn("credentials", {
         email: data.email,
         password: data.password,
         redirect: false,
       });
-  
+
       toast.success("Account created successfully");
+      router.push(`/gym/${gymSlug}`)
     } catch (error) {
-      console.log(error)
+      console.log(error);
       toast.error("Something went wrong");
     } finally {
       setIsLoading(false);
     }
   };
 
-
   const gymName = useWatch({
     control: form.control,
     name: "gymName",
   });
-  
+
   const gymSlug = gymName ? slugifyGymName(gymName) : "";
 
   const gymNameEror = form.formState.errors.gymName;
@@ -99,7 +96,7 @@ export const SignUpView = () => {
                 <span
                   className={cn("text-2xl font-sefmibold", poppins.className)}
                 >
-                  BJJ Desk 
+                  BJJ Desk
                 </span>
               </Link>
               <Button
@@ -123,13 +120,13 @@ export const SignUpView = () => {
                 <FormItem>
                   <FormLabel>Gym name</FormLabel>
                   <FormControl>
-                    <Input {...field} className="max-"/>
+                    <Input {...field} className="max-" />
                   </FormControl>
                   <FormDescription
                     className={cn("hidden", showPreview && "block")}
                   >
-                     Your gym will be available at{" "}
-                     <strong>{gymSlug}.bjjdesk.com</strong>
+                    Your gym will be available at{" "}
+                    <strong>{gymSlug}.bjjdesk.com</strong>
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -164,13 +161,13 @@ export const SignUpView = () => {
               )}
             />
             <Button
-            disabled={isLoading}
-                type="submit"
-                size="lg"
-                variant="elevated"
-                className="bg-black text-white hover:bg-blue-600 mt-4"
+              disabled={isLoading}
+              type="submit"
+              size="lg"
+              variant="elevated"
+              className="bg-black text-white hover:bg-blue-600 mt-4"
             >
-                Start your free trial
+              Start your free trial
             </Button>
           </form>
         </Form>
