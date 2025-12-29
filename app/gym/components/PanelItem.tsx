@@ -9,18 +9,20 @@ interface PanelItemProps {
   icon: IconType;
   title: string;
   URLOveride?: string;
+  gymSlug: string;
 }
 
 const PanelItem = ({
   icon: Icon,
   title,
   URLOveride,
+  gymSlug
 }: PanelItemProps) => {
     const pathname = usePathname()
     const active = pathname.endsWith(URLOveride ? URLOveride : title.toLowerCase())
 
   return (
-    <Link href={`${URLOveride ? URLOveride : title.toLowerCase()}`}>
+    <Link href={`/gym/${gymSlug}/admin/dashboard/${URLOveride ?? title.toLowerCase()}`}>
       <li className={cn("flex flex-row items-center gap-3 cursor-pointer transition-colors hover:bg-blue-600 p-5",
       active && "bg-blue-600  font-semibold text-white/90"
 

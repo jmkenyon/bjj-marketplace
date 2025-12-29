@@ -1,5 +1,5 @@
 const page = () => {
-  return <main className="bg-neutral-100 h-screen"></main>;
+  return <main ></main>;
 };
 
 export default page;

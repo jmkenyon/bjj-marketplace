@@ -6,19 +6,26 @@ import { MdOutlinePayments } from "react-icons/md";
 import { MdOutlineDocumentScanner } from "react-icons/md";
 import { BsQrCode } from "react-icons/bs";
 import { IoSettingsOutline } from "react-icons/io5";
+import { CiCreditCard1 } from "react-icons/ci";
+
 import PanelItem from "./PanelItem";
 
+interface OptionsPanelProps {
+    gymSlug: string;
+}
 
 
-const OptionsPanel = () => {
+
+const OptionsPanel = ({gymSlug}: OptionsPanelProps) => {
   return (
     <section className="w-75 border-r-2 border-black h-screen shadow-accent bg-blue-400">
     <ul className="flex flex-col">
-    <PanelItem  title="Students" icon={PiStudent}/>
-    <PanelItem  title="Payments" icon={MdOutlinePayments}/>
-    <PanelItem title="Documents" icon={MdOutlineDocumentScanner}/>
-    <PanelItem  title="QR drop-in" icon={BsQrCode} URLOveride="qr-code"/>
-    <PanelItem title="Settings" icon={IoSettingsOutline}/>
+    <PanelItem  title="Students" icon={PiStudent} gymSlug={gymSlug}/>
+    <PanelItem  title="Payments" icon={MdOutlinePayments} gymSlug={gymSlug}/>
+    <PanelItem title="Documents" icon={MdOutlineDocumentScanner} gymSlug={gymSlug}/>
+    <PanelItem  title="QR drop-in" icon={BsQrCode} URLOveride="qr-code" gymSlug={gymSlug}/>
+    <PanelItem title="Settings" icon={IoSettingsOutline} gymSlug={gymSlug}/>
+    <PanelItem title="Subscription" icon={CiCreditCard1} gymSlug={gymSlug}/>
     </ul>
   </section>
   )

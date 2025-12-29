@@ -20,11 +20,11 @@ interface LayoutProps {
   };
 }
 export default async function RootLayout({ children, params }: LayoutProps) {
-  const { gymSlug } = await params;
+  const resolvedParams = await params;
 
   const gym = await prisma.gym.findUnique({
     where: {
-      slug: gymSlug,
+      slug: resolvedParams.gymSlug,
     },
   });
 
@@ -46,8 +46,8 @@ export default async function RootLayout({ children, params }: LayoutProps) {
     <>
       <NavbarAdmin gymName={gym.name} gymSlug={gym.slug} />
       <div className="flex h-[calc(100vh-64px)]">
-        <OptionsPanel />
-        <main className="flex-1 p-6">{children}</main>
+        <OptionsPanel gymSlug={gym.slug}/>
+        <main className="flex-1 p-6 bg-neutral-100">{children}</main>
       </div>
     </>
   );
