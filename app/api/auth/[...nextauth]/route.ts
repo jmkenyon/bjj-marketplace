@@ -21,6 +21,14 @@ export const authOptions: AuthOptions = {
 
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
+          include: {
+            gym: {
+              select: {
+                id: true,
+                slug: true,
+              },
+            },
+          },
         });
 
         if (!user || !user.hashedPassword) {
@@ -36,7 +44,13 @@ export const authOptions: AuthOptions = {
           throw new Error("Invalid Credentials");
         }
 
-        return user;
+        return {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+          gymId: user.gymId,
+          gymSlug: user.gym.slug,
+        };
       },
     }),
   ],
@@ -57,6 +71,7 @@ export const authOptions: AuthOptions = {
         token.userId = user.id;
         token.gymId = user.gymId;
         token.role = user.role;
+        token.gymSlug = user.gymSlug
       }
       return token;
     },

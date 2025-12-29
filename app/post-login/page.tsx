@@ -19,5 +19,5 @@ export default async function PostLogin() {
     redirect("/login");
   }
 
-  redirect(`https://${gym.slug}.bjjdesk.com`);
+  redirect(`/gym/${gym.slug}`);
 }

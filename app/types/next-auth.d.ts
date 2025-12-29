@@ -5,14 +5,18 @@ declare module "next-auth" {
   interface Session {
     user: {
       id: string;
-      gymId: string;
       role: string;
+      gymId: string;
+      gymSlug: string;
     } & DefaultSession["user"];
   }
 
   interface User {
-    gymId: string;
+    id: string;
+    email: string;
     role: string;
+    gymId: string;
+    gymSlug: string;
   }
 }
 
@@ -21,5 +25,6 @@ declare module "next-auth/jwt" {
     userId: string;
     gymId: string;
     role: string;
+    gymSlug: string;
   }
 }

@@ -14,7 +14,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { loginSchema } from "../schemas/schemas";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import z from "zod";
@@ -22,12 +21,21 @@ import { signIn } from "next-auth/react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { loginSchema } from "@/app/schemas/schemas";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["700"] });
 
-export const SignInView = () => {
+interface LoginViewParams {
+    gymName: string
+    gymSlug: string
+    role: "Admin" | "Student"
+}
+
+export const LoginView = ({gymName, gymSlug, role}: LoginViewParams) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+
+  const otherLogin = role === "Admin" ? "Student" : "Admin"
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
@@ -40,7 +48,7 @@ export const SignInView = () => {
   
       if (response?.ok) {
         toast.success("Login successful");
-        router.push("/post-login");
+        router.push(`/gym/${gymSlug}/${role.toLocaleLowerCase()}/dashboard`);
       } else {
         toast.error("Invalid email or password");
       }
@@ -68,11 +76,11 @@ export const SignInView = () => {
             className="flex flex-col gap-8 p-4 lg:p-16"
           >
             <div className="flex items-center justify-between mb-8">
-              <Link href="/">
+              <Link href={`/gym/${gymSlug}`}>
                 <span
                   className={cn("text-2xl font-sefmibold", poppins.className)}
                 >
-                  BJJ Desk
+                  {gymName}
                 </span>
               </Link>
               <Button
@@ -81,12 +89,12 @@ export const SignInView = () => {
                 size="sm"
                 className="text-base border-none underline"
               >
-                <Link prefetch href="/free-trial">
-                  Free trial
+                <Link prefetch href={`/gym/${gymSlug}/${otherLogin.toLowerCase()}`}>
+                  {otherLogin} Login
                 </Link>
               </Button>
             </div>
-            <h1 className="text-4xl font-medium">Welcome back to BJJ Desk</h1>
+            <h1 className="text-4xl font-medium">{role} Login</h1>
 
             <FormField
               control={form.control}
@@ -131,7 +139,7 @@ export const SignInView = () => {
       <div
         className="h-screen w-full lg:col-span-2 hidden lg:block"
         style={{
-          backgroundImage: "url('/background.webp')",
+          backgroundImage: "url('/loginview-image.webp')",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
