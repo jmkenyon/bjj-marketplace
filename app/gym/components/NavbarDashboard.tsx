@@ -1,4 +1,5 @@
 import NavButton from "@/app/components/NavButton";
+import { generateTenantURL } from "@/app/lib/utils";
 import Link from "next/link";
 
 interface NavbarDashboardProps {
@@ -8,15 +9,16 @@ interface NavbarDashboardProps {
 
 
 
-const NavbarDashboard = ({gymName}: NavbarDashboardProps) => {
+const NavbarDashboard = ({gymName, gymSlug}: NavbarDashboardProps) => {
   return (
     <nav className="bg-white  border-b-2 border-black flex flex-row items-center justify-between">
       <h1 className="text-black font-semibold text-lg ml-5">{gymName}</h1>
       <div>
-        <Link href={`/student`}>
-        <NavButton className="bg-white text-black">Student Login</NavButton>
+      <Link href={`${generateTenantURL(gymSlug)}/student`}>
+      <NavButton className="bg-white text-black">Student Login</NavButton>
         </Link>
-        <Link href={`/admin`}>
+        <Link href={`${generateTenantURL(gymSlug)}/admin`}>
+
         <NavButton className="bg-black text-white">Admin Login</NavButton>
         </Link>
       </div>
