@@ -32,8 +32,14 @@ const page = async ({ params }: { params: Promise<IParams> }) => {
 
   return (
     <section className="h-full bg-neutral-100">
-      <Modal gym={gym} />
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold">Students</h2>
+        <p className="mt-1 mb-2 text-sm text-slate-600 max-w-prose">
+          Manage your students here.
+        </p>
 
+        <Modal gym={gym} />
+      </div>
       <StudentsTable gym={gym} />
     </section>
   );
