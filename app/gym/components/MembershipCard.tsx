@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button"
 import { Membership } from "@prisma/client"
+import { EditMembershipModal } from "./EditMembershipModal"
 
 interface MembershipCardProps {
     memberships: Membership[]
@@ -12,7 +12,7 @@ const MembershipCard = ({memberships}: MembershipCardProps) => {
     {memberships.map((membership) => (
       <div
         key={membership.id}
-        className="group rounded-lg border bg-white shadow-sm "
+        className="group rounded-lg border bg-white shadow-sm min-h-75 flex flex-col justify-between"
       >
 
         <div className="p-4 border-b border-black">
@@ -23,7 +23,7 @@ const MembershipCard = ({memberships}: MembershipCardProps) => {
 
 
         <div className="p-4 flex flex-col gap-3 flex-1">
-          <p className="text-sm text-slate-600 line-clamp-3">
+          <p className="text-sm text-slate-600 line-clamp-5">
             {membership.description || "No description provided"}
           </p>
         </div>
@@ -33,9 +33,9 @@ const MembershipCard = ({memberships}: MembershipCardProps) => {
           <span className="inline-flex items-center  bg-emerald-400 border-black border px-3 py-2 text-sm font-semibold text-black">
             ${membership.price}
           </span>
-          <Button variant={"outline"}>
+          <EditMembershipModal membership={membership}>
             Edit
-          </Button>
+          </EditMembershipModal>
        
         </div>
       </div>

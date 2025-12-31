@@ -22,3 +22,24 @@ export async function POST(req: Request) {
     );
   }
 }
+
+export async function PUT(req: Request) {
+  const { title, description, price, membershipId } = await req.json();
+  try {
+    await prisma.membership.update({
+      where: { id: membershipId },
+      data: {
+        title,
+        description,
+        price: Number(price)
+      },
+    });
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}

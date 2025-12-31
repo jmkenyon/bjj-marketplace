@@ -48,7 +48,10 @@ export default async function RootLayout({ children, params }: LayoutProps) {
       <NavbarAdmin gymName={gym.name} gymSlug={gym.slug} />
       <div className="flex h-[calc(100vh-64px)]">
         <OptionsPanel gymSlug={gym.slug}/>
-        <main className="flex-1 p-6 bg-neutral-100">{children}</main>
+        <main className="flex-1 p-6 bg-neutral-100 overflow-y-auto">
+
+          {children}
+          </main>
       </div>
     </>
   );

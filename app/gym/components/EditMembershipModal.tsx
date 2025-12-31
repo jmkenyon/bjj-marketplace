@@ -14,40 +14,40 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Gym, Membership } from "@prisma/client";
 
+import { Membership } from "@prisma/client";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import React, { useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
-interface MembershipModalProps {
-  gym: Gym;
-  memberships: Membership[];
+interface EditMembershipModalProps {
+  membership: Membership;
+  children: React.ReactNode
 }
 
-export function MembershipModal({ gym }: MembershipModalProps) {
+export function EditMembershipModal({ membership, children }: EditMembershipModalProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   const { register, handleSubmit } = useForm<FieldValues>({
     defaultValues: {
-      title: "",
-      description: "",
-      price: "",
+      title: membership.title,
+      description: membership.description,
+      price: membership.price,
     },
   });
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+    const payload = {
+        ...data,
+        membershipId: membership.id
+    }
     setIsLoading(true);
     try {
-      const payload = {
-        ...data,
-        gymId: gym.id,
-      };
-      await axios.post("/api/membership", payload);
-      toast.success("Membership created!");
+      await axios.put("/api/membership", payload);
+      toast.success("Update sent");
       router.refresh();
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -64,17 +64,15 @@ export function MembershipModal({ gym }: MembershipModalProps) {
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="outline" className="hover:bg-black hover:text-white">
-          Add membership
+        {children}
         </Button>
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-106.25">
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader>
-            <DialogTitle>Add membership</DialogTitle>
-            <DialogDescription>
-              Add title, description, and price of membership
-            </DialogDescription>
+            <DialogTitle>Edit membership</DialogTitle>
+            <DialogDescription>Edit membership below</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 pt-4">
             <div className="grid gap-3">
@@ -110,5 +108,4 @@ export function MembershipModal({ gym }: MembershipModalProps) {
         </form>
       </DialogContent>
     </Dialog>
-  );
-}
+  )}

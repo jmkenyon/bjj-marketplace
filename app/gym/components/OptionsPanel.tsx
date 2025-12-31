@@ -17,7 +17,7 @@ interface OptionsPanelProps {
 
 const OptionsPanel = ({ gymSlug }: OptionsPanelProps) => {
   return (
-    <section className="w-75 border-r-2 border-black h-screen shadow-accent bg-blue-400">
+    <section className="w-75 border-r-2 border-black h-full shadow-accent bg-blue-400">
       <ul className="flex flex-col">
         <PanelItem title="Students" icon={PiStudent} gymSlug={gymSlug} />
         <PanelItem
