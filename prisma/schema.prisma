@@ -54,6 +54,7 @@ model Gym {
   documents  Document[]
   dropIn     DropIn?
   membership Membership[]
+  classes    Class[]
 }
 
 model Document {
@@ -89,4 +90,28 @@ model Membership {
 
   gymId String @unique @db.ObjectId
   gym   Gym    @relation(fields: [gymId], references: [id])
+}
+
+model Class {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  dayOfWeek DayOfWeek
+  startTime String // "18:30" (24h, easy UI)
+  duration  Int // minutes (e.g. 60, 90)
+
+  gymId String @db.ObjectId
+  gym   Gym    @relation(fields: [gymId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
 }

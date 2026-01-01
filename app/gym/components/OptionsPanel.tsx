@@ -37,12 +37,13 @@ const OptionsPanel = ({ gymSlug }: OptionsPanelProps) => {
           gymSlug={gymSlug}
         />
         <PanelItem
-          title="Classes"
+          title="Timetable"
           icon={FaRegCalendarAlt}
           gymSlug={gymSlug}
         />
         <PanelItem
-          title="Settings"
+          title="Gym Settings"
+          URLOveride="settings"
           icon={IoSettingsOutline}
           gymSlug={gymSlug}
         />
