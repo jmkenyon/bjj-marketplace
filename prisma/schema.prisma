@@ -96,8 +96,8 @@ model Class {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   title     String
   dayOfWeek DayOfWeek
-  startTime String // "18:30" (24h, easy UI)
-  duration  Int // minutes (e.g. 60, 90)
+  startTime String
+  duration  Int
 
   gymId String @db.ObjectId
   gym   Gym    @relation(fields: [gymId], references: [id])
