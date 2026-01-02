@@ -1,5 +1,4 @@
 import prisma from "@/app/lib/prisma";
-import { generateTenantURL } from "@/app/lib/utils";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -12,7 +11,7 @@ export async function POST(req: Request) {
       data: {
         fee: Number(fee),
         gymId,
-         qrCode: `${generateTenantURL(gymSlug)}/drop-in`,
+         qrCode: `https://${gymSlug}.bjjdesk.com/drop-in`,
         documents: {
           connect: documentIds.map((id: string) => ({ id })),
         },

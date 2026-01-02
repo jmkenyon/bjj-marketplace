@@ -20,6 +20,9 @@ const QrView = ({ gym, docs, dropIn, dropInDocIds }: QrViewProps) => {
     documentTitle: "Title",
     contentRef: printRef,
   });
+
+  console.log(dropIn?.qrCode)
+  console.log("hello")
   return (
     <>
       <div className="mb-4">
