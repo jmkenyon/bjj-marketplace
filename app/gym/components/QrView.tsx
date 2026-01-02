@@ -48,7 +48,7 @@ const QrView = ({ gym, docs, dropIn, dropInDocIds }: QrViewProps) => {
       ) : (
         <div className="flex flex-col items-center gap-4 rounded-md border bg-slate-50 p-6">
           <div ref={printRef}>
-            <UserQRCode value="https://bjjdesk.com/" />
+          {dropIn.qrCode && <UserQRCode value={dropIn.qrCode} />}
           </div>
 
           <Button

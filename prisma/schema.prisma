@@ -48,7 +48,6 @@ model Gym {
   name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  qrCode    String?
 
   users      User[]
   documents  Document[]
@@ -74,6 +73,7 @@ model DropIn {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   fee       Int?
+  qrCode    String?
   documents Document[]
 
   gymId String @unique @db.ObjectId

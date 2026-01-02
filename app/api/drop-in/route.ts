@@ -1,8 +1,9 @@
 import prisma from "@/app/lib/prisma";
+import { generateTenantURL } from "@/app/lib/utils";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-  const { fee, documents, gymId } = await req.json();
+  const { fee, documents, gymId, gymSlug } = await req.json();
 
   const documentIds = Array.isArray(documents) ? documents : [documents];
 
@@ -11,11 +12,14 @@ export async function POST(req: Request) {
       data: {
         fee: Number(fee),
         gymId,
+         qrCode: `${generateTenantURL(gymSlug)}/drop-in`,
         documents: {
           connect: documentIds.map((id: string) => ({ id })),
         },
       },
     });
+
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error(error);
@@ -40,7 +44,7 @@ export async function PUT(req: Request) {
         fee: Number(fee),
         gymId,
         documents: {
-          connect: documentIds.map((id: string) => ({ id })),
+          set: documentIds.map((id: string) => ({ id })),
         },
       },
     });

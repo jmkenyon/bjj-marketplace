@@ -60,7 +60,7 @@ export function DropInModal({
         gymId: gym.id,
       };
       if (!dropIn) {
-        await axios.post("/api/drop-in", payload);
+        await axios.post("/api/drop-in", {...payload, gymSlug: gym.slug});
         toast.success("Drop in settings created!");
       } else {
         await axios.put("/api/drop-in", {...payload, dropInId: dropIn.id});

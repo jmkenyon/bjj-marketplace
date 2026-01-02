@@ -82,7 +82,7 @@ const Calendar = ({ classes }: CalenderProps) => {
         <TableFooter>
           <TableRow>
             <TableCell colSpan={8}>Total classes</TableCell>
-            <TableCell className="text-right">15</TableCell>
+            <TableCell className="text-right">{classes.length}</TableCell>
           </TableRow>
         </TableFooter>
       </Table>
