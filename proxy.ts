@@ -19,6 +19,9 @@ export default async function proxy(req: NextRequest) {
   if (pathname.startsWith("/login")) {
     return NextResponse.next();
   }
+  if (pathname.startsWith("/drop-in")) {
+    return NextResponse.next();
+  }
 
   if (!hostname.endsWith(`.${rootDomain}`)) {
     return NextResponse.next();
