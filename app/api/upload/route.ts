@@ -26,15 +26,7 @@ export async function POST(request: NextRequest) {
   try {
     const signedUrl = await getSignedUrlForUpload(objectKey, fileType);
 
-    await prisma.document.create({
-      data: {
-        title,
-        fileUrl: objectKey,
-        gym: {
-          connect: { id: gymId },
-        },
-      },
-    });
+    
 
     return NextResponse.json({ signedUrl });
   } catch (error) {

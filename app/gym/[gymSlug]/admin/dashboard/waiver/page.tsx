@@ -1,5 +1,6 @@
 import EmptyState from "@/app/components/EmptyState";
-import { DocumentsModal } from "@/app/gym/components/DocumentsModal";
+import { WaiverView } from "@/app/gym/components/WaiverView";
+
 import prisma from "@/app/lib/prisma";
 
 interface IParams {
@@ -24,12 +25,13 @@ const page = async ({ params }: { params: Promise<IParams> }) => {
     );
   }
 
-  const docs = await prisma.document.findMany({
-    where: { gymId: gym.id },
-    orderBy: { createdAt: "desc" },
+  const waiver = await prisma.waiver.findFirst({
+    where: {
+      gymId: gym.id,
+    },
   });
 
-  return <DocumentsModal gym={gym} />;
+  return <WaiverView waiverContent={waiver} />;
 };
 
 export default page;

@@ -26,22 +26,21 @@ const Page = async ({ params }: { params: Promise<IParams> }) => {
     );
   }
 
-  const docs = await prisma.document.findMany({
-    where: { gymId: gym.id },
-    orderBy: { createdAt: "desc" },
-  });
+
 
   const dropIn = await prisma.dropIn.findUnique({
     where: { gymId: gym.id },
-    include: { documents: true },
+ 
   })
 
-  const dropInDocIds = dropIn?.documents.map(doc => doc.id);
+
+
+
 
   return (
-   
-      <QrView gym={gym} docs={docs} dropIn={dropIn} dropInDocIds={dropInDocIds}/>
-  
+    <section className="mt-10 ">
+      <QrView gym={gym}  dropIn={dropIn} />
+    </section>
   );
 };
 

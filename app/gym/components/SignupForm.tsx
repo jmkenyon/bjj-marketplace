@@ -20,30 +20,40 @@ import {
 } from "@/components/ui/select";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import { useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { DOBPicker } from "./DOBPicker";
 import { RequiredLabel } from "@/app/lib/helpers";
 import { CountryDropdown } from "@/components/ui/country-dropdown";
-import { Membership } from "@prisma/client";
-
-
+import { Membership, Waiver } from "@prisma/client";
+import { Textarea } from "@/components/ui/textarea";
+import { SignaturePad } from "./SignaturePad";
 
 interface SignupFormProps {
   memberships: Membership[];
+  waiver: Waiver | null;
 }
 
-const SignupForm = ({ memberships }: SignupFormProps) => {
+const SignupForm = ({ memberships, waiver }: SignupFormProps) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<FieldValues>({
-    defaultValues: {},
+    defaultValues: {
+      signedWaiver: false,
+      signature: "",
+      password: "",
+      confirmPassword: "",
+    },
   });
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
+    if (!data.signedWaiver || !data.signature) {
+      toast.error("You must sign the waiver");
+      return;
+    }
     try {
       await axios.put("/api/new-user", data);
       toast.success("Update sent");
@@ -363,69 +373,143 @@ const SignupForm = ({ memberships }: SignupFormProps) => {
           </div>
         </section>
 
-        <section className="shadow-sm border bg-white p-10 rounded-lg">
+        <section className="shadow-sm border bg-white p-10 rounded-lg mb-10">
           <h2 className="text-xl font-bold mb-6">Membership</h2>
 
           <FormField
-  control={form.control}
-  name="membershipId"
-  rules={{ required: "Please select a membership" }}
-  render={({ field }) => (
-    <FormItem>
-      <FormLabel>
-        <RequiredLabel>Choose a membership</RequiredLabel>
-      </FormLabel>
+            control={form.control}
+            name="membershipId"
+            rules={{ required: "Please select a membership" }}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  <RequiredLabel>Choose a membership</RequiredLabel>
+                </FormLabel>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {memberships.map((membership) => {
-          const selected = field.value === membership.id;
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {memberships.map((membership) => {
+                    const selected = field.value === membership.id;
 
-          return (
-            <button
-              key={membership.id}
-              type="button"
-              onClick={() => field.onChange(membership.id)}
-              className={`
+                    return (
+                      <button
+                        key={membership.id}
+                        type="button"
+                        onClick={() => field.onChange(membership.id)}
+                        className={`
                 rounded-lg border p-5 text-left transition
                 cursor-pointer
-                ${selected 
-                  ? "border-black bg-slate-50 ring-2 ring-black"
-                  : "hover:border-slate-400"
+                ${
+                  selected
+                    ? "border-black bg-slate-50 ring-2 ring-black"
+                    : "hover:border-slate-400"
                 }
               `}
-            >
-              <h3 className="text-lg font-semibold">
-                {membership.title}
-              </h3>
+                      >
+                        <h3 className="text-lg font-semibold">
+                          {membership.title}
+                        </h3>
 
-              {membership.description && (
-                <p className="mt-1 text-sm text-slate-600">
-                  {membership.description}
-                </p>
+                        {membership.description && (
+                          <p className="mt-1 text-sm text-slate-600">
+                            {membership.description}
+                          </p>
+                        )}
+
+                        <div className="mt-4 text-xl font-bold">
+                          ${membership.price}
+                          <span className="text-sm font-normal text-slate-500">
+                            / month
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </section>
+
+        <section className="shadow-sm border bg-white p-10 rounded-lg mb-10">
+          <h2 className="text-xl font-bold mb-6">Waiver</h2>
+
+          <FormItem>
+            <FormLabel>
+              <RequiredLabel>Waiver</RequiredLabel>
+            </FormLabel>
+
+            <Textarea
+              className="border p-3 rounded mb-4"
+              readOnly
+              value={waiver?.content}
+            />
+            <SignaturePad
+              onSign={async (signature) => {
+                form.setValue("signature", signature);
+                form.setValue("signedWaiver", true);
+                toast.success("Signature captured");
+              }}
+            />
+
+            <FormMessage />
+          </FormItem>
+        </section>
+
+        <section className="shadow-sm border bg-white p-10 rounded-lg mb-10">
+          <h2 className="text-xl font-bold mb-6">Account password</h2>
+
+          <div className="flex flex-row gap-8">
+            <FormField
+              control={form.control}
+              name="password"
+              rules={{
+                required: "Password is required",
+                minLength: {
+                  value: 8,
+                  message: "Password must be at least 8 characters",
+                },
+              }}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    <RequiredLabel>Create a password</RequiredLabel>
+                  </FormLabel>
+
+                  <FormControl>
+                    <Input type="password" {...field} />
+                  </FormControl>
+
+                  <FormMessage />
+                </FormItem>
               )}
+            />
 
-              <div className="mt-4 text-xl font-bold">
-                ${membership.price}
-                <span className="text-sm font-normal text-slate-500">
-                  / month
-                </span>
-              </div>
-            </button>
-          );
-        })}
-      </div>
-  
-      <FormMessage />
-    </FormItem>
-  )}
-/>
-            
-         
- 
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              rules={{
+                required: "Please confirm your password",
+                validate: (value) =>
+                  value === form.getValues("password") ||
+                  "Passwords do not match",
+              }}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    <RequiredLabel>Confirm password</RequiredLabel>
+                  </FormLabel>
 
-          
-        
-          
+                  <FormControl>
+                    <Input type="password" {...field} />
+                  </FormControl>
+
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </section>
       </form>
     </Form>

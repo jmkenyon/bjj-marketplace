@@ -2,11 +2,13 @@
 
 import { PiStudent } from "react-icons/pi";
 import { MdOutlinePayments } from "react-icons/md";
-import { MdOutlineDocumentScanner } from "react-icons/md";
+
 import { BsQrCode } from "react-icons/bs";
 import { CiCreditCard1 } from "react-icons/ci";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { IoMdInformationCircleOutline } from "react-icons/io";
+import { IoDocumentTextOutline } from "react-icons/io5";
+
 
 import PanelItem from "./PanelItem";
 
@@ -25,8 +27,8 @@ const OptionsPanel = ({ gymSlug }: OptionsPanelProps) => {
           gymSlug={gymSlug}
         />
         <PanelItem
-          title="Documents"
-          icon={MdOutlineDocumentScanner}
+          title="Waiver"
+          icon={IoDocumentTextOutline}
           gymSlug={gymSlug}
         />
         <PanelItem
