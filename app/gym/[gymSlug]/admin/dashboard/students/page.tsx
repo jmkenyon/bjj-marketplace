@@ -40,7 +40,9 @@ const page = async ({ params }: { params: Promise<IParams> }) => {
 
         <Modal gym={gym} />
       </div>
+      <div className="pb-2">
       <StudentsTable gym={gym} />
+      </div>
     </section>
   );
 };
