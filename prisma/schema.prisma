@@ -69,6 +69,7 @@ enum AccessType {
   FREE_TRIAL
   DROP_IN
   MEMBERSHIP
+  NONE
 }
 
 enum UserRole {

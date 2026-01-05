@@ -20,7 +20,8 @@ export async function POST(req: Request) {
         email,
         belt,
         role: "STUDENT",
-        gymId: session.user.gymId, // 🔐 never trust client gymId
+        gymId: session.user.gymId,
+        type: "NONE",
       },
     });
 
