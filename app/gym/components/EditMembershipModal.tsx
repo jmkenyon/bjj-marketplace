@@ -47,7 +47,7 @@ export function EditMembershipModal({ membership, children }: EditMembershipModa
     setIsLoading(true);
     try {
       await axios.put("/api/membership", payload);
-      toast.success("Update sent");
+      toast.success("Membership updated!");
       router.refresh();
     } catch (error) {
       if (axios.isAxiosError(error)) {

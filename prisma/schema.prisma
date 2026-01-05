@@ -39,7 +39,7 @@ model User {
   type             AccessType
 
   role UserRole
-  belt Belt?
+  belt Belt?  @default(WHITE)
 
   membershipId String?     @db.ObjectId
   membership   Membership? @relation(fields: [membershipId], references: [id])

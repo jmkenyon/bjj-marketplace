@@ -55,7 +55,7 @@ export function Modal({gym}: ModalProps) {
         gymId: gym.id
       };
       await axios.post("/api/new-user", finalPayload);
-      toast.success("Update sent");
+      toast.success("User added!");
       router.refresh()
     } catch (error) {
       if (axios.isAxiosError(error)) {

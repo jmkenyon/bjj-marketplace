@@ -54,7 +54,7 @@ const SettingsForm = ({ gym }: SettingsFormParams) => {
     };
     try {
       await axios.put("/api/information", payload);
-      toast.success("Update sent");
+      toast.success("Gym info saved!");
       router.refresh();
     } catch (error) {
       if (axios.isAxiosError(error)) {

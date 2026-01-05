@@ -38,7 +38,12 @@ const StudentsTable = ({ gym }: StudentsTableProps) => {
               <TableCell>
                 <Image
                   alt={`${user.belt?.toLowerCase()} belt`}
-                  src={`/${user.belt?.toLowerCase()}.png`}
+                  src={
+                    user.belt ? 
+                    (`/${user.belt?.toLowerCase()}.png`)
+                    : 
+                    "/white.png"
+                  }
                   width={50}
                   height={50}
                   className="relative -left-2"
