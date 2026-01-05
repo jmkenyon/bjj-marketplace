@@ -40,7 +40,9 @@ const page = async ({ params }: { params: Promise<IParams> }) => {
         </p>
         <ClassModal gymId={gym.id} />
       </div>
+
       <Calendar classes={classes} />
+
     </section>
   );
 };

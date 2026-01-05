@@ -22,7 +22,7 @@ export function WaiverModal({isLoading, handleSave}: WaiverModalProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" className="hover:bg-black hover:text-white">
+        <Button variant="outline" className="bg-black text-white hover:bg-black/80 hover:text-white">
           Save waiver
         </Button>
       </DialogTrigger>

@@ -35,7 +35,7 @@ const Calendar = ({ classes }: CalenderProps) => {
     classes.find((c) => c.startTime === time);
 
   return (
-    <section className=" bg-white p-6 shadow-sm mb-6 rounded-xl border">
+    <section className=" bg-white p-6 shadow-sm mb-6 rounded-xl border pb-2">
       <Table>
         <TableCaption>Weekly timetable</TableCaption>
         <TableHeader>
