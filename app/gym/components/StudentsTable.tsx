@@ -33,7 +33,7 @@ const StudentsTable = ({ gym }: StudentsTableProps) => {
         <TableBody>
           {gym.users.map((user, index) => (
             <TableRow key={index}>
-              <TableCell className="font-medium">{user.name}</TableCell>
+              <TableCell className="font-medium">{user.firstName}{" "}{user.lastName}</TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell>
                 <Image
