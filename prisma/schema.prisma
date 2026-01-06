@@ -103,6 +103,11 @@ model Gym {
   currency  Currency?
   freeTrial Boolean?
 
+  plan          SaaSPlan   @default(TRIAL)
+  trialEndsAt   DateTime?
+  subscriptionId String? 
+
+
   users         User[]
   waiver        Waiver?
   dropIn        DropIn?
@@ -110,6 +115,12 @@ model Gym {
   classes       Class[]
   signedWaivers SignedWaiver[]
   accessPasses  AccessPass[]
+}
+
+enum SaaSPlan {
+  TRIAL
+  ACTIVE
+  CANCELLED
 }
 
 model Waiver {
