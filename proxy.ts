@@ -61,6 +61,21 @@ export default async function proxy(req: NextRequest) {
   }
 
   /* -----------------------------
+   ADMIN DASHBOARD (ADMIN ONLY)
+------------------------------ */
+if (pathname.startsWith("/admin/dashboard")) {
+  if (!token) {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
+
+  if (token.role !== "ADMIN") {
+    return NextResponse.redirect(
+      new URL("/student/dashboard", req.url)
+    );
+  }
+}
+
+  /* -----------------------------
      PUBLIC ROUTES
   ------------------------------ */
   if (
