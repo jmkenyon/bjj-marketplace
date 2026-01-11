@@ -17,7 +17,7 @@ import {
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import z from "zod";
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -27,29 +27,35 @@ import { generateTenantURL } from "@/app/lib/utils";
 const poppins = Poppins({ subsets: ["latin"], weight: ["700"] });
 
 interface LoginViewParams {
-    gymName: string
-    gymSlug: string
-    role: "Admin" | "Student"
+  gymName: string;
+  gymSlug: string;
+  role: "Admin" | "Student";
 }
 
-export const LoginView = ({gymName, gymSlug, role}: LoginViewParams) => {
+export const LoginView = ({ gymName, gymSlug, role }: LoginViewParams) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  const otherLogin = role === "Admin" ? "Student" : "Admin"
+  const otherLogin = role === "Admin" ? "Student" : "Admin";
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
-  
+
     try {
       const response = await signIn("credentials", {
         ...data,
         redirect: false,
       });
-  
+
       if (response?.ok) {
+        const session = await getSession();
+
         toast.success("Login successful");
-        router.push(`${generateTenantURL(gymSlug)}/${role.toLowerCase()}/dashboard/information`);
+        if (session?.user.role === "ADMIN") {
+          router.push(`${generateTenantURL(gymSlug)}/admin/dashboard`);
+        } else {
+          router.push(`${generateTenantURL(gymSlug)}/student/dashboard`);
+        }
       } else {
         toast.error("Invalid email or password");
       }
@@ -90,7 +96,12 @@ export const LoginView = ({gymName, gymSlug, role}: LoginViewParams) => {
                 size="sm"
                 className="text-base border-none underline"
               >
-                <Link prefetch href={`${generateTenantURL(gymSlug)}/${otherLogin.toLowerCase()}`}>
+                <Link
+                  prefetch
+                  href={`${generateTenantURL(
+                    gymSlug
+                  )}/${otherLogin.toLowerCase()}`}
+                >
                   {otherLogin} Login
                 </Link>
               </Button>
