@@ -35,46 +35,135 @@ model User {
   contactNumber String?
   relationship  String?
 
-  hasUsedFreeTrial Boolean    @default(false)
-  type             AccessType
+  role UserRole @default(VISITOR)
+  belt Belt?    @default(WHITE)
 
-  role UserRole
-  belt Belt?  @default(WHITE)
+  // Only required for gym owners / admins
+  gymId String? @db.ObjectId
+  gym   Gym?    @relation(fields: [gymId], references: [id])
 
-  membershipId String?     @db.ObjectId
-  membership   Membership? @relation(fields: [membershipId], references: [id])
-
-  gymId String @db.ObjectId
-  gym   Gym    @relation(fields: [gymId], references: [id])
-
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  signedWaivers SignedWaiver[]
   accessPasses  AccessPass[]
+  signedWaivers SignedWaiver[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Gym {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  slug     String   @unique
+  name     String
+  about    String?
+  address  String?
+  currency Currency @default(USD)
+
+  stripeAccountId String?
+  stripeEnabled   Boolean @default(false)
+
+  dropIn DropIn?
+  waiver Waiver?
+
+  users         User[]
+  classes       Class[]
+  accessPasses  AccessPass[]
+  signedWaivers SignedWaiver[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model AccessPass {
-  id     String     @id @default(auto()) @map("_id") @db.ObjectId
-  type   AccessType
-  usedAt DateTime   @default(now())
+  id        String           @id @default(auto()) @map("_id") @db.ObjectId
+  type      AccessType
+  status    AccessPassStatus @default(ACTIVE)
+  usedAt    DateTime?
+  expiresAt DateTime?
+
+
+  classId String? @db.ObjectId
+  class   Class?  @relation(fields: [classId], references: [id])
+
+  isPaid Boolean @default(false)
 
   userId String @db.ObjectId
   user   User   @relation(fields: [userId], references: [id])
 
   gymId String @db.ObjectId
   gym   Gym    @relation(fields: [gymId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, gymId, type])
+  @@index([userId, gymId, classId])
 }
 
-enum AccessType {
-  FREE_TRIAL
-  DROP_IN
-  MEMBERSHIP
-  NONE
+model DropIn {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  fee      Int
+  currency Currency
+
+  qrCode String?
+
+  gymId String @unique @db.ObjectId
+  gym   Gym    @relation(fields: [gymId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SignedWaiver {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  waiverText String
+  signature  String
+  signedAt   DateTime @default(now())
+
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id])
+
+  gymId    String  @db.ObjectId
+  gym      Gym     @relation(fields: [gymId], references: [id])
+  waiver   Waiver? @relation(fields: [waiverId], references: [id])
+  waiverId String? @db.ObjectId
+
+  @@unique([userId, waiverId])
+}
+
+model Class {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  dayOfWeek DayOfWeek
+  startTime String
+  duration  Int
+  isFree    Boolean   @default(false)
+
+  gymId String @db.ObjectId
+  gym   Gym    @relation(fields: [gymId], references: [id])
+
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  accessPasses AccessPass[]
+}
+
+model Waiver {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  updatedAt DateTime @updatedAt
+
+  gymId         String         @unique @db.ObjectId
+  gym           Gym            @relation(fields: [gymId], references: [id])
+  signedWaivers SignedWaiver[]
+}
+
+enum AccessPassStatus {
+  ACTIVE
+  USED
+  EXPIRED
+  CANCELLED
 }
 
 enum UserRole {
+  VISITOR
   ADMIN
-  STUDENT
 }
 
 enum Belt {
@@ -92,104 +181,6 @@ enum Gender {
   UNSPECIFIED
 }
 
-model Gym {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  slug      String    @unique
-  name      String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  about     String?
-  address   String?
-  currency  Currency?
-  freeTrial Boolean?
-
-  plan          SaaSPlan   @default(TRIAL)
-  trialEndsAt   DateTime?
-  subscriptionId String? 
-
-
-  users         User[]
-  waiver        Waiver?
-  dropIn        DropIn?
-  membership    Membership[]
-  classes       Class[]
-  signedWaivers SignedWaiver[]
-  accessPasses  AccessPass[]
-}
-
-enum SaaSPlan {
-  TRIAL
-  ACTIVE
-  CANCELLED
-}
-
-model Waiver {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  content   String
-  updatedAt DateTime @updatedAt
-
-  gymId         String         @unique @db.ObjectId
-  gym           Gym            @relation(fields: [gymId], references: [id])
-  signedWaivers SignedWaiver[]
-}
-
-model SignedWaiver {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  waiverText String
-  signature  String
-  signedAt   DateTime @default(now())
-
-  userId String @db.ObjectId
-  user   User   @relation(fields: [userId], references: [id])
-
-  waiverId String @db.ObjectId
-  waiver   Waiver @relation(fields: [waiverId], references: [id])
-
-  gymId String @db.ObjectId
-  gym   Gym    @relation(fields: [gymId], references: [id])
-
-  @@unique([userId, waiverId])
-  @@index([userId, gymId])
-}
-
-model DropIn {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  fee       Int?
-  qrCode    String?
-
-  gymId String @unique @db.ObjectId
-  gym   Gym    @relation(fields: [gymId], references: [id])
-}
-
-model Membership {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  price       Int
-  title       String
-  description String?
-
-  gymId String @db.ObjectId
-  gym   Gym    @relation(fields: [gymId], references: [id])
-  users User[]
-}
-
-model Class {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  title     String
-  dayOfWeek DayOfWeek
-  startTime String
-  duration  Int
-
-  gymId String @db.ObjectId
-  gym   Gym    @relation(fields: [gymId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 enum DayOfWeek {
   MONDAY
   TUESDAY
@@ -204,4 +195,9 @@ enum Currency {
   USD
   GBP
   EUR
+}
+
+enum AccessType {
+  DROP_IN
+  OPEN_MAT
 }
