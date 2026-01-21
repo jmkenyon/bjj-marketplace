@@ -21,8 +21,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { title, dayOfWeek, startTime, duration, isFree } =
-      await req.json();
+    const { title, dayOfWeek, startTime, duration, isFree } = await req.json();
 
     const gymId = session.user.gymId;
 
@@ -30,9 +29,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Gym ID not found" }, { status: 400 });
     }
 
-    if (!title || !startTime || !duration) {
+    if (!title || !startTime || duration === undefined || duration === null) {
       return NextResponse.json(
         { error: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
+    const durationNumber = Number(duration);
+    if (!Number.isFinite(durationNumber) || durationNumber <= 0) {
+      return NextResponse.json(
+        { error: "Duration must be a positive number" },
         { status: 400 }
       );
     }
@@ -49,9 +56,9 @@ export async function POST(req: Request) {
         title,
         dayOfWeek,
         startTime,
-        duration: Number(duration),
+        duration: durationNumber,
         gymId,
-        isFree: Boolean(isFree),
+        isFree,
       },
     });
 

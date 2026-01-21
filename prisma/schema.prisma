@@ -95,6 +95,7 @@ model AccessPass {
 
   @@index([userId, gymId, type])
   @@index([userId, gymId, classId])
+  @@unique([userId, gymId, classId, status])
 }
 
 model DropIn {

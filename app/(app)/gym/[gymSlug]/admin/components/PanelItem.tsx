@@ -23,10 +23,10 @@ const PanelItem = ({
 }: PanelItemProps) => {
   const pathname = usePathname();
   const slug = URLOveride ?? title.toLowerCase();
-  const href = `${generateTenantURL(gymSlug)}/${type}/dashboard/${slug}`;
+  const basePath = `/gym/${gymSlug}`;
+  const href = `${basePath}/${type}/dashboard/${slug}`;
 
-  const active =
-    pathname === href || pathname.endsWith(`/${slug}`);
+  const active = pathname === href || pathname.startsWith(href);
 
   return (
     <Link
@@ -48,9 +48,7 @@ const PanelItem = ({
       />
 
       {/* Hide text on mobile */}
-      <span className="hidden md:block truncate">
-        {title}
-      </span>
+      <span className="hidden md:block truncate">{title}</span>
     </Link>
   );
 };

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 import { sendDropInConfirmationEmail } from "@/lib/email";
+import { Prisma } from "@prisma/client";
 
 export async function POST(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -101,15 +102,28 @@ export async function POST(req: Request) {
       );
     }
 
-    await prisma.accessPass.create({
-      data: {
-        type: "DROP_IN",
-        userId: user.id,
-        gymId: gym.id,
-        classId,
-        isPaid: selectedClass.isFree, // free classes auto-paid
-      },
-    });
+    try {
+      await prisma.accessPass.create({
+        data: {
+          type: "DROP_IN",
+          userId: user.id,
+          gymId: gym.id,
+          classId,
+          isPaid: selectedClass.isFree,
+        },
+      });
+    } catch (err) {
+      if (
+        err instanceof Prisma.PrismaClientKnownRequestError &&
+        err.code === "P2002"
+      ) {
+        return NextResponse.json(
+          { error: "You are already booked for this class" },
+          { status: 409 }
+        );
+      }
+      throw err;
+    }
 
     // Save waiver once per user
     if (gym.waiver) {
@@ -133,7 +147,7 @@ export async function POST(req: Request) {
       }
     }
 
-    sendDropInConfirmationEmail({
+    await sendDropInConfirmationEmail({
       to: user.email,
       gymName: gym.name,
       classTitle: selectedClass.title,

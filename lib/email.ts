@@ -26,8 +26,8 @@ export async function sendDropInConfirmationEmail({
   });
 
   if (error) {
-    return console.error({ error });
+    throw error
   }
 
-  console.log({ data });
+  return data
 }
