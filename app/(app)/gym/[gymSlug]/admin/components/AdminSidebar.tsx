@@ -6,7 +6,7 @@ import { BsQrCode } from "react-icons/bs";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { IoMdInformationCircleOutline } from "react-icons/io";
 import { IoDocumentTextOutline } from "react-icons/io5";
-import { MdOutlinePayments } from "react-icons/md";
+
 import { IconType } from "react-icons";
 
 interface AdminSidebarProps {
@@ -57,15 +57,7 @@ const SIDEBAR_SECTIONS: SidebarSection[] = [
       },
     ],
   },
-  // {
-  //   label: "Settings",
-  //   items: [
-  //     {
-  //       title: "Payments",
-  //       icon: MdOutlinePayments,
-  //     },
-  //   ],
-  // },
+
 ];
 
 const AdminSidebar = ({ gymSlug }: AdminSidebarProps) => {

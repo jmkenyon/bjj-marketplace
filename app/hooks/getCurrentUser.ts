@@ -12,8 +12,6 @@ export async function getCurrentUser() {
       id: session.user.id,
     },
     include: {
-      membership: true,
-      gym: true,
       accessPasses: true,
     },
   });

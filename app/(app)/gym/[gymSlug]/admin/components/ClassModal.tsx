@@ -1,6 +1,6 @@
 "use client";
 
-import { days, start_time } from "@/app/(app)/list-your-gym/data";
+import { days, start_time } from "@/app/(app)/(auth)/list-your-gym/data";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

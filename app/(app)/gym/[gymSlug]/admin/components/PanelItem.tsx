@@ -10,7 +10,7 @@ interface PanelItemProps {
   icon: IconType;
   title: string;
   URLOveride?: string;
-  gymSlug: string;
+  gymSlug?: string; // only required for admin
   type: "admin" | "student";
 }
 
@@ -23,7 +23,11 @@ const PanelItem = ({
 }: PanelItemProps) => {
   const pathname = usePathname();
   const slug = URLOveride ?? title.toLowerCase();
-  const href = `${generateTenantURL(gymSlug)}/${type}/dashboard/${slug}`;
+
+  const href =
+    type === "admin"
+      ? `${generateTenantURL(gymSlug!)}/admin/dashboard/${slug}`
+      : `/student/dashboard/${slug}`;
 
   const active =
     pathname === href || pathname.endsWith(`/${slug}`);
@@ -34,7 +38,7 @@ const PanelItem = ({
       className={cn(
         "group flex items-center justify-center md:justify-start gap-3 rounded-lg px-3 py-3 text-sm font-medium transition",
         "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900",
-        active && "bg-neutral-900! text-white!"
+        active && "bg-neutral-900 text-white"
       )}
     >
       <Icon

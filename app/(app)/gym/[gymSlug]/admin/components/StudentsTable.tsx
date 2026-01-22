@@ -12,8 +12,9 @@ import {
 } from "@/components/ui/table";
 import Image from "next/image";
 import { FaFileInvoiceDollar } from "react-icons/fa";
-import { StudentsModal } from "./StudentsModal";
+
 import { User } from "@prisma/client";
+import { StudentsModal } from "./StudentsModal";
 
 interface StudentsTableProps {
   students: User[];

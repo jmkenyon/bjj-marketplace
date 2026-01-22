@@ -10,16 +10,21 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { about, address, currency, freeTrialEnabled } = await req.json();
+  const { about, address, currency  } = await req.json();
+
+  const gymId = session.user.gymId 
+
+  if (!gymId) {
+    return NextResponse.json({ error: "Gym ID not found" }, { status: 400 });
+  }
 
   try {
     await prisma.gym.update({
-      where: { id: session.user.gymId },
+      where: { id: gymId },
       data: {
         about,
         address,
         currency,
-        freeTrialEnabled,
       },
     });
 

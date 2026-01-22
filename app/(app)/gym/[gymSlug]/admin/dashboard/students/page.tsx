@@ -1,4 +1,3 @@
-import { Modal } from "@/app/(app)/gym/[gymSlug]/admin/components/Modal";
 import StudentsTable from "@/app/(app)/gym/[gymSlug]/admin/components/StudentsTable";
 import EmptyState from "@/app/(app)/components/EmptyState";
 
@@ -52,8 +51,6 @@ const page = async ({ params }: { params: Promise<IParams> }) => {
             People who have trained at your gym via drop-ins or visits.
           </p>
         </div>
-
-        <Modal gym={gym} />
       </div>
 
       {/* Table */}

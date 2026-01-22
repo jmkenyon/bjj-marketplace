@@ -1,4 +1,5 @@
-import { start_time } from "@/app/(app)/list-your-gym/data";
+
+import { start_time } from "@/app/(app)/(auth)/list-your-gym/data";
 import {
   Table,
   TableBody,

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import prisma from "@/app/lib/prisma";
-import EmptyState from "@/app/(app)/components/EmptyState";
+
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/(auth)/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
@@ -39,7 +39,7 @@ export default async function RootLayout({ children, params }: LayoutProps) {
       <NavbarAdmin gymName={gym.name} gymSlug={gym.slug} />
 
       <div className="flex h-[calc(100vh-64px)] min-h-0 bg-neutral-100">
-        <OptionsPanel gymSlug={gym.slug} session={session} />
+        <OptionsPanel session={session} />
 
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
