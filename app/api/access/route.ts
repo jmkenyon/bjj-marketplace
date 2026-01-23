@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 import { sendDropInConfirmationEmail } from "@/lib/email";
+import crypto from "crypto";
 
 export async function POST(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -132,12 +133,26 @@ export async function POST(req: Request) {
         });
       }
     }
+    let token: string | undefined;
 
-    sendDropInConfirmationEmail({
+    if (!user.hashedPassword) {
+      token = crypto.randomBytes(32).toString("hex");
+
+      await prisma.passwordToken.create({
+        data: {
+          token,
+          userId: user.id,
+          expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
+        },
+      });
+    }
+
+    await sendDropInConfirmationEmail({
       to: user.email,
       gymName: gym.name,
       classTitle: selectedClass.title,
       date: `${selectedClass.dayOfWeek} at ${selectedClass.startTime}`,
+      token, // undefined for existing users
     });
 
     return NextResponse.json({ success: true }, { status: 201 });
