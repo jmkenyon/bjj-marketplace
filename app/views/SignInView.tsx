@@ -140,7 +140,7 @@ export const SignInView = () => {
       <div
         className="hidden lg:block lg:col-span-2 h-screen"
         style={{
-          backgroundImage: "url('/marketplace-preview.webp')",
+          backgroundImage: "url('/login-view-image.webp')",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}

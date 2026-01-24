@@ -56,7 +56,7 @@ export const LoginView = ({ gymName, gymSlug, role }: LoginViewParams) => {
       }
 
       if (session.user.role === "VISITOR") {
-        router.replace(`${base}/student/dashboard`);
+        router.replace(`/student/dashboard`);
         return;
       }
 
@@ -96,8 +96,9 @@ export const LoginView = ({ gymName, gymSlug, role }: LoginViewParams) => {
 
       if (session?.user.role === "ADMIN") {
         router.push(`${base}/admin/dashboard`);
+
       } else {
-        router.push(`${base}/student/dashboard`);
+        router.push(`/student/dashboard`);
       }
     } catch {
       toast.error("Something went wrong");
@@ -200,7 +201,7 @@ export const LoginView = ({ gymName, gymSlug, role }: LoginViewParams) => {
       <div
         className="hidden lg:block lg:col-span-2"
         style={{
-          backgroundImage: "url('/loginview-image.webp')",
+          backgroundImage: "url('/login-view-image.webp')",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}

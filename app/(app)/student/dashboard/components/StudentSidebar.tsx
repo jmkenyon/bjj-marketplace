@@ -20,19 +20,6 @@ interface SidebarSection {
 
 const STUDENT_SIDEBAR_SECTIONS: SidebarSection[] = [
   {
-    label: "Account",
-    items: [
-      {
-        title: "Profile",
-        icon: CgProfile,
-      },
-      {
-        title: "Settings",
-        icon: IoSettingsOutline,
-      },
-    ],
-  },
-  {
     label: "Training",
     items: [
       {
@@ -48,6 +35,19 @@ const STUDENT_SIDEBAR_SECTIONS: SidebarSection[] = [
       {
         title: "Payments",
         icon: MdOutlinePayments,
+      },
+    ],
+  },
+  {
+    label: "Account",
+    items: [
+      {
+        title: "Profile",
+        icon: CgProfile,
+      },
+      {
+        title: "Settings",
+        icon: IoSettingsOutline,
       },
     ],
   },

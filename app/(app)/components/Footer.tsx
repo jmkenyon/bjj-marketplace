@@ -22,7 +22,9 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li><Link href="/explore" className="hover:underline">Find gyms</Link></li>
               <li><Link href="/how-it-works" className="hover:underline">How it works</Link></li>
-              <li><Link href="/pricing" className="hover:underline">Pricing</Link></li>
+
+              <li><Link href="/contact" className="hover:underline">Contact</Link></li>
+           
             </ul>
           </div>
 
@@ -33,8 +35,8 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2 text-sm">
               <li><Link href="/list-your-gym" className="hover:underline">List your gym</Link></li>
-              <li><Link href="/dashboard" className="hover:underline">Owner dashboard</Link></li>
-              <li><Link href="/contact" className="hover:underline">Contact sales</Link></li>
+              <li><Link href="/pricing" className="hover:underline">Pricing</Link></li>
+
             </ul>
           </div>
 

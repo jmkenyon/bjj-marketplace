@@ -33,7 +33,12 @@ const page = async ({ params }: { params: Promise<IParams> }) => {
   }
 
   const accessPasses = await prisma.accessPass.findMany({
-    where: { gymId: gym.id },
+    where: {
+      gymId: gym.id,
+      user: {
+        isNot: undefined,
+      },
+    },
     include: { user: true },
   });
 

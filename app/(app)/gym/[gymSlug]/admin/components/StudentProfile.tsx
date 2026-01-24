@@ -1,6 +1,6 @@
 "use client";
 
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { FieldValues, SubmitHandler, useForm, useWatch } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -8,7 +8,6 @@ import {
   FormItem,
   FormLabel,
   FormControl,
-  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
@@ -21,6 +20,7 @@ import {
 import axios from "axios";
 import toast from "react-hot-toast";
 import Image from "next/image";
+import { DOBPicker } from "../../../components/DOBPicker";
 
 interface StudentProfileFormProps {
   user: {
@@ -29,11 +29,6 @@ interface StudentProfileFormProps {
     gender?: string | null;
     phone?: string | null;
     dateOfBirth?: string | null;
-    street?: string | null;
-    city?: string | null;
-    postCode?: string | null;
-    county?: string | null;
-    country?: string | null;
     contactName?: string | null;
     contactNumber?: string | null;
     relationship?: string | null;
@@ -45,18 +40,18 @@ interface StudentProfileFormProps {
 const BELTS = ["WHITE", "BLUE", "PURPLE", "BROWN", "BLACK"] as const;
 
 export const StudentProfileForm = ({ user }: StudentProfileFormProps) => {
+  const formatDateForInput = (date?: string | null) => {
+    if (!date) return "";
+    return new Date(date).toISOString().split("T")[0];
+  };
+
   const form = useForm<FieldValues>({
     defaultValues: {
       firstName: user.firstName ?? "",
       lastName: user.lastName ?? "",
       gender: user.gender ?? "UNSPECIFIED",
       phone: user.phone ?? "",
-      dateOfBirth: user.dateOfBirth ?? "",
-      street: user.street ?? "",
-      city: user.city ?? "",
-      postCode: user.postCode ?? "",
-      county: user.county ?? "",
-      country: user.country ?? "",
+      dateOfBirth: formatDateForInput(user.dateOfBirth),
       contactName: user.contactName ?? "",
       contactNumber: user.contactNumber ?? "",
       relationship: user.relationship ?? "",
@@ -73,66 +68,93 @@ export const StudentProfileForm = ({ user }: StudentProfileFormProps) => {
     }
   };
 
-  const selectedBelt = form.watch("belt") ?? "WHITE";
+  const selectedBelt =
+    useWatch({ control: form.control, name: "belt" }) ?? "WHITE";
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-
         {/* PERSONAL INFO */}
         <section>
           <h3 className="mb-4 text-lg font-semibold">Personal information</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormField name="firstName" control={form.control} render={({ field }) => (
-              <FormItem>
-                <FormLabel>First name</FormLabel>
-                <FormControl><Input {...field} /></FormControl>
-              </FormItem>
-            )} />
+            <FormField
+              name="firstName"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>First name</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
-            <FormField name="lastName" control={form.control} render={({ field }) => (
-              <FormItem>
-                <FormLabel>Last name</FormLabel>
-                <FormControl><Input {...field} /></FormControl>
-              </FormItem>
-            )} />
+            <FormField
+              name="lastName"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Last name</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
-            <FormField name="gender" control={form.control} render={({ field }) => (
-              <FormItem>
-                <FormLabel>Gender</FormLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="MALE">Male</SelectItem>
-                    <SelectItem value="FEMALE">Female</SelectItem>
-                    <SelectItem value="OTHER">Other</SelectItem>
-                    <SelectItem value="UNSPECIFIED">Prefer not to say</SelectItem>
-                  </SelectContent>
-                </Select>
-              </FormItem>
-            )} />
+            <FormField
+              name="gender"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Gender</FormLabel>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="MALE">Male</SelectItem>
+                      <SelectItem value="FEMALE">Female</SelectItem>
+                      <SelectItem value="OTHER">Other</SelectItem>
+                      <SelectItem value="UNSPECIFIED">
+                        Prefer not to say
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
 
-            <FormField name="phone" control={form.control} render={({ field }) => (
-              <FormItem>
-                <FormLabel>Phone</FormLabel>
-                <FormControl><Input {...field} /></FormControl>
-              </FormItem>
-            )} />
+            <FormField
+              name="phone"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
-            <FormField name="dateOfBirth" control={form.control} render={({ field }) => (
-              <FormItem>
-                <FormLabel>Date of birth</FormLabel>
-                <FormControl>
-                  <Input type="date" {...field} />
-                </FormControl>
-              </FormItem>
-            )} />
+            <FormField
+              name="dateOfBirth"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Date of birth</FormLabel>
+                  <FormControl>
+                    <DOBPicker {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
           </div>
         </section>
-
 
         {/* EMERGENCY CONTACT */}
         <section>
@@ -142,15 +164,36 @@ export const StudentProfileForm = ({ user }: StudentProfileFormProps) => {
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <FormField name="contactName" control={form.control} render={({ field }) => (
-              <FormItem><FormLabel>Name</FormLabel><Input {...field} /></FormItem>
-            )} />
-            <FormField name="contactNumber" control={form.control} render={({ field }) => (
-              <FormItem><FormLabel>Number</FormLabel><Input {...field} /></FormItem>
-            )} />
-            <FormField name="relationship" control={form.control} render={({ field }) => (
-              <FormItem><FormLabel>Relationship</FormLabel><Input {...field} /></FormItem>
-            )} />
+            <FormField
+              name="contactName"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <Input {...field} />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="contactNumber"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Number</FormLabel>
+                  <Input {...field} />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="relationship"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Relationship</FormLabel>
+                  <Input {...field} />
+                </FormItem>
+              )}
+            />
           </div>
         </section>
 
@@ -203,7 +246,9 @@ export const StudentProfileForm = ({ user }: StudentProfileFormProps) => {
 
         {/* ACCOUNT */}
         <section className="rounded-lg border bg-slate-50 p-4 text-sm text-slate-600">
-          <p><strong>Email:</strong> {user.email}</p>
+          <p>
+            <strong>Email:</strong> {user.email}
+          </p>
           <p className="mt-1">
             Your account is portable across gyms you train at.
           </p>

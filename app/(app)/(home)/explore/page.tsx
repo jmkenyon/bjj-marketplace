@@ -1,6 +1,7 @@
 import prisma from "@/app/lib/prisma";
-import ExploreClient from "../components/ExploreClient";
-import Navbar from "../components/Navbar";
+import ExploreClient from "../../components/ExploreClient";
+
+
 
 export const metadata = {
   title: "Explore BJJ Gyms | BJJ Desk",
@@ -32,7 +33,7 @@ export default async function ExplorePage() {
 
   return (
     <div className="min-h-screen bg-neutral-100">
-      <Navbar />
+
       <ExploreClient gyms={gyms} />
     </div>
   );

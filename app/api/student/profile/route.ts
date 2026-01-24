@@ -20,14 +20,10 @@ export async function PATCH(req: Request) {
       gender: data.gender,
       phone: data.phone,
       dateOfBirth: data.dateOfBirth,
-      street: data.street,
-      city: data.city,
-      postCode: data.postCode,
-      county: data.county,
-      country: data.country,
       contactName: data.contactName,
       contactNumber: data.contactNumber,
       relationship: data.relationship,
+      belt: data.belt
     },
   });
 
