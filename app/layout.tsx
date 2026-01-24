@@ -16,15 +16,21 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <body className={`${inter.className} bg-neutral-100`}>
         <ToastProvider />
-        {children}
-        <Footer />
+
+        <div className="flex min-h-screen flex-col">
+          {/* Main content */}
+          <main className="flex-1">{children}</main>
+
+          {/* Footer */}
+          <Footer />
+        </div>
       </body>
     </html>
   );

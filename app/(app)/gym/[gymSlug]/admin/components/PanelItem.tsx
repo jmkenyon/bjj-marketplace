@@ -38,7 +38,7 @@ const PanelItem = ({
       className={cn(
         "group flex items-center justify-center md:justify-start gap-3 rounded-lg px-3 py-3 text-sm font-medium transition",
         "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900",
-        active && "bg-neutral-900 text-white"
+        active && "bg-neutral-900 hover:bg-neutral-900 hover:text-white text-white"
       )}
     >
       <Icon

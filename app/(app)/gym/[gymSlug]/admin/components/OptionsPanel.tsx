@@ -1,5 +1,5 @@
 import AdminSidebar from "./AdminSidebar";
-import StudentSidebar from "./StudentSidebar";
+import StudentSidebar from "../../../../student/dashboard/components/StudentSidebar";
 import type { Session } from "next-auth";
 
 interface OptionsPanelProps {
