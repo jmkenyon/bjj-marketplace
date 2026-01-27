@@ -9,7 +9,7 @@ export default function HowItWorksPage() {
       {/* HERO */}
       <section className="px-6 py-24 text-center">
         <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-neutral-900">
-          How BJJ Desk works
+          How BJJ Mat works
         </h1>
         <p className="mt-4 max-w-2xl mx-auto text-lg text-neutral-600">
           Drop in. Train anywhere. No awkward front desk moments.
@@ -110,7 +110,7 @@ export default function HowItWorksPage() {
             Built for real gyms
           </h2>
           <p className="mt-4 text-neutral-600">
-            BJJ Desk is designed specifically for Brazilian Jiu-Jitsu gyms. No
+            BJJ Mat is designed specifically for Brazilian Jiu-Jitsu gyms. No
             bloated features. No generic fitness software.
           </p>
 
@@ -128,7 +128,7 @@ export default function HowItWorksPage() {
           Ready to get started?
         </h2>
         <p className="mt-3 text-neutral-300">
-          Whether you’re travelling or running a gym — BJJ Desk has you covered.
+          Whether you’re travelling or running a gym — BJJ Mat has you covered.
         </p>
 
         <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">

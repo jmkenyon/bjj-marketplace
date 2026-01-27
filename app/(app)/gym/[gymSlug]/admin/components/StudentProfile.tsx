@@ -42,7 +42,11 @@ const BELTS = ["WHITE", "BLUE", "PURPLE", "BROWN", "BLACK"] as const;
 export const StudentProfileForm = ({ user }: StudentProfileFormProps) => {
   const formatDateForInput = (date?: string | null) => {
     if (!date) return "";
-    return new Date(date).toISOString().split("T")[0];
+    const d = new Date(date);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
   };
 
   const form = useForm<FieldValues>({
@@ -170,7 +174,9 @@ export const StudentProfileForm = ({ user }: StudentProfileFormProps) => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Name</FormLabel>
-                  <Input {...field} />
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
                 </FormItem>
               )}
             />
@@ -180,7 +186,9 @@ export const StudentProfileForm = ({ user }: StudentProfileFormProps) => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Number</FormLabel>
-                  <Input {...field} />
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
                 </FormItem>
               )}
             />
@@ -190,7 +198,9 @@ export const StudentProfileForm = ({ user }: StudentProfileFormProps) => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Relationship</FormLabel>
-                  <Input {...field} />
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
                 </FormItem>
               )}
             />

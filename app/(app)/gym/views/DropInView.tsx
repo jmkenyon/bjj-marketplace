@@ -10,7 +10,6 @@ import { useRouter } from "next/navigation";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import WaiverCard from "../[gymSlug]/admin/components/WaiverCard";
 import SignUpCard from "../[gymSlug]/admin/components/SignUpCard";
-import CardPaymentMethod from "../components/CardPaymentMethod";
 import { generateTenantURL } from "@/app/lib/utils";
 
 interface DropInViewProps {
@@ -31,6 +30,7 @@ const DropInView = ({ gym, waiver, dropIn, classes }: DropInViewProps) => {
       lastName: "",
       gender: "",
       phone: "",
+      sessionDate: "",
       email: "",
       dateOfBirth: "",
       signedWaiver: false,
@@ -39,31 +39,52 @@ const DropInView = ({ gym, waiver, dropIn, classes }: DropInViewProps) => {
   });
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-    if (waiver && (!data.signedWaiver || !data.signature)) {
-      toast.error("Please sign the waiver to continue");
-      setIsLoading(false);
+    if (!data.sessionDate) {
+      toast.error("Please select a date");
+      return;
+    }
+    if (!selectedClass) {
+      toast.error("Please select a class");
       return;
     }
 
-    if (!selectedClass) {
-      toast.error("Please select a class");
-      setIsLoading(false);
+    if (waiver && (!data.signedWaiver || !data.signature)) {
+      toast.error("Please sign the waiver");
       return;
     }
+
     setIsLoading(true);
+
     try {
-      await axios.post(`/api/access?gym=${gym.slug}`, {
-        ...data,
-        classId: selectedClass.id,
-      });
-      toast.success("Drop-in booked!");
-      router.push(`${generateTenantURL(gym.slug)}/success`);
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data?.error ?? "Request failed");
-      } else {
-        toast.error("Something went wrong");
+      // ✅ FREE CLASS
+      if (selectedClass.isFree || dropIn.fee === 0) {
+        await axios.post(`/api/access?gym=${gym.slug}`, {
+          ...data,
+          classId: selectedClass.id,
+        });
+
+        toast.success("Drop-in booked!");
+        router.push(`${generateTenantURL(gym.slug)}/success`);
+        return;
       }
+
+      // 💳 PAID CLASS → Stripe
+      const res = await axios.post("/api/stripe/checkout", {
+        amount: dropIn.fee * 100,
+        currency: gym.currency.toLowerCase(),
+        gymStripeAccountId: gym.stripeAccountId,
+        successUrl: `${generateTenantURL(gym.slug)}/success`,
+        cancelUrl: window.location.href,
+        metadata: {
+          gymId: gym.id,
+          classId: selectedClass.id,
+          ...data,
+        },
+      });
+
+      window.location.href = res.data.url;
+    } catch {
+      toast.error("Something went wrong");
     } finally {
       setIsLoading(false);
     }
@@ -134,28 +155,39 @@ const DropInView = ({ gym, waiver, dropIn, classes }: DropInViewProps) => {
           )}
         </section>
 
+        <section className="mb-8 rounded-xl border bg-white p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-neutral-900">
+            Select a date
+          </h2>
+
+          <input
+            type="date"
+            {...form.register("sessionDate", { required: true })}
+            className="mt-3 w-64 rounded-md border px-3 py-2 text-sm"
+          />
+
+          {form.formState.errors.sessionDate && (
+            <p className="mt-2 text-sm text-red-600">Please select a date</p>
+          )}
+        </section>
+
         <PersonDetailsSection control={form.control} />
 
         {/* Waiver */}
         {waiver && <WaiverCard waiver={waiver} form={form} />}
 
-        {/* Payment */}
-        {dropIn.fee > 0 && !selectedClass?.isFree && (
-          <CardPaymentMethod
-            control={form.control}
-            title={`Drop-in fee: ${currencySymbol}${dropIn.fee}`}
-            subtitle="Secure payment required to complete your booking"
-          />
-        )}
-
         {/* Confirm */}
         <SignUpCard
           isLoading={isLoading}
-          title="Confirm drop-in"
+          title={
+            selectedClass?.isFree
+              ? "Confirm drop-in"
+              : `Pay ${currencySymbol}${dropIn.fee} & book`
+          }
           subtitle={
             selectedClass?.isFree
               ? "This class is free — no payment required"
-              : "Review your details and complete your booking"
+              : "Secure payment required to complete booking"
           }
         />
       </form>

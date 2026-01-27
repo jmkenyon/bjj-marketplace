@@ -8,7 +8,7 @@ import NavbarAdmin from "../components/NavbarAdmin";
 import OptionsPanel from "../components/OptionsPanel";
 
 export const metadata: Metadata = {
-  title: "BJJ Desk | Admin Dashboard",
+  title: "BJJ Mat | Admin Dashboard",
   description:
     "Manage students, access passes, drop-ins, waivers, and gym settings.",
 };

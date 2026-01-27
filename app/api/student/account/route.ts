@@ -29,6 +29,10 @@ export async function DELETE() {
         where: { userId },
       }),
 
+      prisma.payment.deleteMany({
+        where: { userId },
+      }),
+
       // Finally delete the user
       prisma.user.delete({
         where: { id: userId },

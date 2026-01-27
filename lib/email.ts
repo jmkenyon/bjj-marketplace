@@ -48,7 +48,7 @@ export async function sendDropInConfirmationEmail({
   `;
 
   const { data, error } = await resend.emails.send({
-    from: "BJJ Desk <noreply@bjjmat.io>",
+    from: "BJJ Mat <noreply@bjjmat.io>",
     to,
     subject: `You're booked at ${gymName}`,
     text: `You're booked!\n\n${classTitle}\n${date}\n\nCreate an account to manage bookings.`,
@@ -68,7 +68,7 @@ export async function sendDropInConfirmationEmail({
   
         <hr />
   
-        <p>See you on the mats,<br/><strong>BJJ Desk</strong></p>
+        <p>See you on the mats,<br/><strong>BJJ Mat</strong></p>
       </div>
     </div>
   `,

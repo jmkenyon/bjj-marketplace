@@ -17,7 +17,7 @@ const Navbar = async () => {
 
   if (isLoggedIn) {
     if (role === "ADMIN" && gymSlug) {
-      dashboardHref = `${generateTenantURL(gymSlug)}/admin/dashboard`;
+      dashboardHref = `${generateTenantURL(gymSlug)}/admin/dashboard/information`;
     }
 
     if (role === "VISITOR") {

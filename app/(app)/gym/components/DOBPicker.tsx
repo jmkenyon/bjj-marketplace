@@ -21,11 +21,7 @@ export function DOBPicker({ value, onChange }: DOBPickerProps) {
 
   // normalize to Date for UI
   const dateValue =
-    typeof value === "string"
-      ? value
-        ? new Date(value)
-        : undefined
-      : value;
+    typeof value === "string" ? (value ? new Date(value) : undefined) : value;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -35,9 +31,7 @@ export function DOBPicker({ value, onChange }: DOBPickerProps) {
           variant="outline"
           className="w-48 justify-between font-normal"
         >
-          {dateValue
-            ? dateValue.toLocaleDateString("en-GB")
-            : "dd/mm/yyyy"}
+          {dateValue ? dateValue.toLocaleDateString("en-GB") : "dd/mm/yyyy"}
           <ChevronDownIcon className="h-4 w-4 opacity-60" />
         </Button>
       </PopoverTrigger>
@@ -51,7 +45,12 @@ export function DOBPicker({ value, onChange }: DOBPickerProps) {
             if (!date) return;
 
             // emit YYYY-MM-DD string
-            onChange(date.toISOString().split("T")[0]);
+            // emit YYYY-MM-DD string using local date (avoids UTC shift)
+            const yyyy = date.getFullYear();
+            const mm = String(date.getMonth() + 1).padStart(2, "0");
+            const dd = String(date.getDate()).padStart(2, "0");
+            onChange(`${yyyy}-${mm}-${dd}`);
+
             setOpen(false);
           }}
         />

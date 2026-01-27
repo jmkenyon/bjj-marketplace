@@ -7,13 +7,11 @@ import Footer from "./(app)/components/Footer";
 const inter = Inter({
   subsets: ["latin"],
 });
-
 export const metadata: Metadata = {
-  title: "BJJ Desk",
+  title: "BJJ Mat | Train Anywhere",
   description:
-    "BJJ Desk helps Brazilian Jiu-Jitsu gyms manage students, memberships, attendance, and payments — all in one simple platform.",
+    "BJJ Mat lets Brazilian Jiu-Jitsu athletes find gyms, book drop-ins, sign waivers, and train anywhere in the world — no memberships required.",
 };
-
 export default function RootLayout({
   children,
 }: {

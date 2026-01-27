@@ -1,4 +1,5 @@
 export default function PrivacyPage() {
+  const LAST_UPDATED = "24 January 2026"
     return (
       <div className="mx-auto max-w-3xl px-6 py-20 text-neutral-800">
         <h1 className="text-3xl font-semibold tracking-tight">
@@ -6,12 +7,12 @@ export default function PrivacyPage() {
         </h1>
   
         <p className="mt-4 text-sm text-neutral-600">
-          Last updated: {new Date().toLocaleDateString("en-GB")}
+          Last updated: {LAST_UPDATED}
         </p>
   
         <section className="mt-10 space-y-6 text-sm leading-relaxed">
           <p>
-            Your privacy matters to us. This policy explains how BJJ Desk collects,
+            Your privacy matters to us. This policy explains how BJJ Mat collects,
             uses, and protects your information.
           </p>
   
@@ -37,7 +38,7 @@ export default function PrivacyPage() {
           <h2 className="text-lg font-semibold">3. Payments</h2>
           <p>
             Payment information is handled by third-party providers such as Stripe.
-            BJJ Desk does not store full payment details.
+            BJJ Mat does not store full payment details.
           </p>
   
           <h2 className="text-lg font-semibold">4. Data sharing</h2>

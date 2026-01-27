@@ -34,9 +34,10 @@ export default async function proxy(req: NextRequest) {
 
     // Students should NEVER be on tenant domains
     if (isTenantDomain) {
-      return NextResponse.redirect(
-        new URL("/student/dashboard", req.url)
-      );
+      const url = req.nextUrl.clone();
+      url.hostname = rootDomain;
+      url.pathname = "/student/dashboard";
+      return NextResponse.redirect(url);
     }
 
     return NextResponse.next();
@@ -51,20 +52,14 @@ export default async function proxy(req: NextRequest) {
     }
 
     if (!token) {
-      return NextResponse.rewrite(
-        new URL(`/gym/${gymSlug}/admin`, req.url)
-      );
+      return NextResponse.rewrite(new URL(`/gym/${gymSlug}/admin`, req.url));
     }
 
     if (token.role === "ADMIN") {
-      return NextResponse.redirect(
-        new URL("/admin/dashboard", req.url)
-      );
+      return NextResponse.redirect(new URL("/admin/dashboard", req.url));
     }
 
-    return NextResponse.redirect(
-      new URL("/student/dashboard", req.url)
-    );
+    return NextResponse.redirect(new URL("/student/dashboard", req.url));
   }
 
   /* -----------------------------
@@ -76,9 +71,7 @@ export default async function proxy(req: NextRequest) {
     }
 
     if (token.role !== "ADMIN") {
-      return NextResponse.redirect(
-        new URL("/student/dashboard", req.url)
-      );
+      return NextResponse.redirect(new URL("/student/dashboard", req.url));
     }
 
     if (!isTenantDomain || token.gymSlug !== gymSlug) {
@@ -92,9 +85,7 @@ export default async function proxy(req: NextRequest) {
   const publicRoutes = ["/", "/drop-in"];
 
   if (
-    publicRoutes.some(
-      (p) => pathname === p || pathname.startsWith(`${p}/`)
-    )
+    publicRoutes.some((p) => pathname === p || pathname.startsWith(`${p}/`))
   ) {
     if (isTenantDomain && gymSlug) {
       return NextResponse.rewrite(
@@ -109,9 +100,7 @@ export default async function proxy(req: NextRequest) {
      DEFAULT TENANT REWRITE
   ------------------------------ */
   if (isTenantDomain && gymSlug) {
-    return NextResponse.rewrite(
-      new URL(`/gym/${gymSlug}${pathname}`, req.url)
-    );
+    return NextResponse.rewrite(new URL(`/gym/${gymSlug}${pathname}`, req.url));
   }
 
   return NextResponse.next();

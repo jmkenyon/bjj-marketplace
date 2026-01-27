@@ -21,12 +21,15 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Poppins } from "next/font/google";
+import { useSearchParams } from "next/navigation";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["700"] });
 
 export const SignInView = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl");
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -43,11 +46,16 @@ export const SignInView = () => {
       const response = await signIn("credentials", {
         ...data,
         redirect: false,
+        callbackUrl: callbackUrl ?? undefined,
       });
 
       if (response?.ok) {
         toast.success("Welcome back");
-        router.push("/post-login");
+        router.push(
+          callbackUrl
+            ? `/post-login?callbackUrl=${encodeURIComponent(callbackUrl)}`
+            : "/post-login"
+        );
       } else {
         toast.error("Invalid email or password");
       }
@@ -69,7 +77,10 @@ export const SignInView = () => {
           >
             {/* Header */}
             <div className="flex items-center justify-between">
-              <Link href="/" className={cn("text-2xl font-bold", poppins.className)}>
+              <Link
+                href="/"
+                className={cn("text-2xl font-bold", poppins.className)}
+              >
                 BJJ Mat
               </Link>
               <Link href="/list-your-gym" className="text-sm underline">
@@ -80,9 +91,7 @@ export const SignInView = () => {
             {/* Copy */}
             <div className="space-y-2">
               <h1 className="text-4xl font-semibold">Log in</h1>
-              <p className="text-neutral-600">
-                Login to BJJ Mat
-              </p>
+              <p className="text-neutral-600">Login to BJJ Mat</p>
             </div>
 
             {/* Email */}

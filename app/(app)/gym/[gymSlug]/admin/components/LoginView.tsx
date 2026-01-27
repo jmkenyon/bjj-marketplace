@@ -51,7 +51,7 @@ export const LoginView = ({ gymName, gymSlug, role }: LoginViewParams) => {
       const base = generateTenantURL(gymSlug);
 
       if (session.user.role === "ADMIN" && role === "Admin") {
-        router.replace(`${base}/admin/dashboard`);
+        router.replace(`${base}/admin/dashboard/information`);
         return;
       }
 
@@ -95,7 +95,7 @@ export const LoginView = ({ gymName, gymSlug, role }: LoginViewParams) => {
       const base = generateTenantURL(gymSlug);
 
       if (session?.user.role === "ADMIN") {
-        router.push(`${base}/admin/dashboard`);
+        router.push(`${base}/admin/dashboard/information`);
 
       } else {
         router.push(`/student/dashboard`);

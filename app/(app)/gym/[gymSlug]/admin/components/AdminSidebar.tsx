@@ -61,7 +61,7 @@ const SIDEBAR_SECTIONS: SidebarSection[] = [
     label: "Account",
     items: [
       {
-        title: "Settings",
+        title: "Payments",
         icon: MdOutlinePayments,
       },
     ],
