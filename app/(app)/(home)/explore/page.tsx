@@ -4,7 +4,7 @@ import ExploreClient from "../../components/ExploreClient";
 
 
 export const metadata = {
-  title: "Explore BJJ Gyms | BJJ Desk",
+  title: "Explore BJJ Gyms | BJJ Mat",
   description:
     "Find Brazilian Jiu-Jitsu gyms near you. Browse drop-in friendly gyms, view schedules, and train anywhere.",
 };

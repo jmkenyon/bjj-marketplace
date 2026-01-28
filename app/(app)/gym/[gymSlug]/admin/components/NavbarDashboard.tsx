@@ -20,7 +20,7 @@ const NavbarDashboard = async ({ gymName, gymSlug }: NavbarDashboardProps) => {
 
   if (isLoggedIn) {
     if (role === "ADMIN" && gymSlugLoggedIn) {
-      dashboardHref = `${generateTenantURL(gymSlugLoggedIn)}/admin/dashboard`;
+      dashboardHref = `${generateTenantURL(gymSlugLoggedIn)}/admin/dashboard/information`;
     }
 
     if (role === "VISITOR") {

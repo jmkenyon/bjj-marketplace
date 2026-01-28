@@ -10,9 +10,16 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { about, address, currency  } = await req.json();
+  const {
+    about,
+    address,
+    currency,
+    country,
+    latitude,
+    longitude,
+  } = await req.json();
 
-  const gymId = session.user.gymId 
+  const gymId = session.user.gymId;
 
   if (!gymId) {
     return NextResponse.json({ error: "Gym ID not found" }, { status: 400 });
@@ -25,6 +32,9 @@ export async function PUT(req: Request) {
         about,
         address,
         currency,
+        country,
+        latitude,
+        longitude,
       },
     });
 

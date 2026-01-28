@@ -64,6 +64,11 @@ model Gym {
   address  String?
   currency Currency @default(USD)
 
+  country   String? // "GB", "US", "BR"
+  city      String?
+  latitude  Float?
+  longitude Float?
+
   stripeAccountId String?
   stripeEnabled   Boolean @default(false)
 
@@ -91,6 +96,11 @@ model AccessPass {
   class   Class?  @relation(fields: [classId], references: [id])
 
   isPaid Boolean @default(false)
+
+  stripeSessionId       String? @unique
+  stripePaymentIntentId String?
+
+  sessionDate DateTime
 
   userId String @db.ObjectId
   user   User   @relation(fields: [userId], references: [id])

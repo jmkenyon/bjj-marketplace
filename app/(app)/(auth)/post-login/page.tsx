@@ -4,12 +4,22 @@ import prisma from "@/app/lib/prisma";
 import { redirect } from "next/navigation";
 import { generateTenantURL } from "@/app/lib/utils";
 
-export default async function PostLogin() {
+export default async function PostLogin({
+  searchParams,
+}: {
+  searchParams?: { callbackUrl?: string };
+}) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
     redirect("/login");
   }
+
+  if (searchParams?.callbackUrl) {
+    redirect(searchParams.callbackUrl);
+  }
+
+
 
   // 🔹 STUDENT / VISITOR → platform dashboard
   if (session.user.role === "VISITOR") {
@@ -30,5 +40,5 @@ export default async function PostLogin() {
     redirect("/login");
   }
 
-  redirect(`${generateTenantURL(gym.slug)}/admin/dashboard`);
+  redirect(`${generateTenantURL(gym.slug)}/admin/dashboard/information`);
 }

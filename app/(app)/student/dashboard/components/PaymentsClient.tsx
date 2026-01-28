@@ -15,15 +15,26 @@ interface Payment {
 export default function PaymentsClient() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    axios.get("/api/student/payments")
-      .then(res => setPayments(res.data))
+    axios
+      .get("/api/student/payments")
+      .then((res) => setPayments(res.data))
+      .catch(() => setError("Failed to load payments"))
       .finally(() => setLoading(false));
   }, []);
 
   if (loading) {
     return <p className="text-sm text-neutral-500">Loading payments…</p>;
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-xl border border-red-200 bg-red-50 p-12 text-center text-red-600">
+        {error}
+      </div>
+    );
   }
 
   if (!payments.length) {
@@ -46,7 +57,7 @@ export default function PaymentsClient() {
           </tr>
         </thead>
         <tbody>
-          {payments.map(p => (
+          {payments.map((p) => (
             <tr key={p.id} className="border-b">
               <td className="p-3">{p.gym.name}</td>
               <td className="p-3">{p.description}</td>

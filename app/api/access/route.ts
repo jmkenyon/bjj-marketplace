@@ -25,11 +25,14 @@ export async function POST(req: Request) {
     lastName,
     gender,
     phone,
+    sessionDate,
     email,
     dateOfBirth,
     signature,
     classId,
   } = await req.json();
+
+  const newSessionDate = new Date(sessionDate);
 
   if (!classId) {
     return NextResponse.json(
@@ -108,6 +111,7 @@ export async function POST(req: Request) {
         userId: user.id,
         gymId: gym.id,
         classId,
+        sessionDate: newSessionDate,
         isPaid: selectedClass.isFree, // free classes auto-paid
       },
     });

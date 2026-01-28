@@ -1,10 +1,12 @@
 import EmptyState from "@/app/(app)/components/EmptyState";
 import prisma from "@/app/lib/prisma";
-import { generateTenantURL } from "@/app/lib/utils";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/(auth)/auth/[...nextauth]/route";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import DropInView from "../../../views/DropInView";
 import NavbarDashboard from "../../admin/components/NavbarDashboard";
+import { redirect } from "next/navigation";
 
 interface IParams {
   gymSlug: string;
@@ -29,7 +31,7 @@ const DropInPage = async ({ params }: { params: Promise<IParams> }) => {
 
   const classes = await prisma.class.findMany({
     where: { gymId: gym.id },
-  })
+  });
 
   const dropIn = await prisma.dropIn.findUnique({
     where: { gymId: gym.id },
@@ -42,6 +44,14 @@ const DropInPage = async ({ params }: { params: Promise<IParams> }) => {
         subtitle="This gym is not currently accepting drop-ins"
       />
     );
+  }
+
+  const session = await getServerSession(authOptions);
+
+  const isStudent = session?.user?.role === "VISITOR";
+
+  if (isStudent) {
+    redirect(`/student/dashboard/drop-in?gymId=${gym.id}`);
   }
 
   return (
@@ -67,24 +77,31 @@ const DropInPage = async ({ params }: { params: Promise<IParams> }) => {
         {/* Existing account */}
         <div className="rounded-xl border bg-white p-6 shadow-sm text-center">
           <h2 className="text-sm font-medium text-neutral-900">
-            Already trained here before?
+            Already have a BJJ Mat account?
           </h2>
           <p className="mt-1 text-sm text-neutral-600">
-            Log in to skip the form and book faster.
+            Log in to book in seconds.
           </p>
 
           <Button
             asChild
             className="mt-4 bg-neutral-900 text-white hover:bg-neutral-800"
           >
-            <Link href={`${generateTenantURL(gym.slug)}/student`}>
+            <Link
+              href={`/login?callbackUrl=/student/dashboard/drop-in?gymId=${gym.id}`}
+            >
               Student login
             </Link>
           </Button>
         </div>
 
         {/* Drop-in form */}
-        <DropInView gym={gym} waiver={waiver} dropIn={dropIn} classes={classes}/>
+        <DropInView
+          gym={gym}
+          waiver={waiver}
+          dropIn={dropIn}
+          classes={classes}
+        />
       </section>
     </main>
   );

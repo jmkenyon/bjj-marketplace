@@ -1,5 +1,6 @@
 "use client";
 
+import { generateTenantURL } from "@/app/lib/utils";
 import Link from "next/link";
 
 interface Gym {
@@ -17,7 +18,7 @@ export default function GymsTrainedAtClient({ gyms }: { gyms: Gym[] }) {
           Gyms you’ve trained at
         </h1>
         <p className="mt-1 text-sm text-neutral-600">
-          A record of every gym you’ve visited via BJJ Desk.
+          A record of every gym you’ve visited via BJJ Mat.
         </p>
       </header>
 
@@ -42,7 +43,7 @@ export default function GymsTrainedAtClient({ gyms }: { gyms: Gym[] }) {
 
               <div className="mt-4">
                 <Link
-                  href={`https://${gym.slug}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
+                  href={`${generateTenantURL(gym.slug)}`}
                   className="text-sm font-medium text-black underline hover:opacity-80"
                 >
                   View gym →

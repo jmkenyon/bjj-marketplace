@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   FormControl,
   FormField,
@@ -10,7 +9,7 @@ import {
   FormMessage,
   Form,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+
 import {
   Select,
   SelectContent,
@@ -26,20 +25,35 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import LocationSelect, {
+  CountrySelectValue,
+} from "../../../components/LocationSelect";
+
+import StripeBox from "./StripeBox";
 
 interface SettingsFormParams {
   gym: Gym;
+  adminEmail: string;
 }
 
-const SettingsForm = ({ gym }: SettingsFormParams) => {
+const SettingsForm = ({ gym, adminEmail }: SettingsFormParams) => {
   const router = useRouter();
+  const [editingAddress, setEditingAddress] = useState(false);
+  const [location, setLocation] = useState<CountrySelectValue | undefined>(
+    undefined
+  );
+
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingStripe, setIsLoadingStripe] = useState(false);
 
   const form = useForm<FieldValues>({
     defaultValues: {
       about: gym.about ?? "",
       address: gym.address ?? "",
       currency: gym.currency ?? "USD",
+      country: gym.country ?? "",
+      latitude: gym.latitude,
+      longitude: gym.longitude,
     },
   });
 
@@ -61,6 +75,35 @@ const SettingsForm = ({ gym }: SettingsFormParams) => {
       }
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleCreateAccount = async () => {
+    if (!gym.country) {
+      toast.error("Please select a valid address");
+      return;
+    }
+    setIsLoadingStripe(true);
+    try {
+      const res = await fetch("/api/gym/create-connect-account", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: adminEmail, // OR admin email
+          country: gym.country,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to create Stripe account");
+
+      const { onboardingUrl } = await res.json();
+
+      // Redirect to Stripe onboarding
+      window.location.href = onboardingUrl;
+    } catch {
+      toast.error("Failed to connect Stripe");
+    } finally {
+      setIsLoadingStripe(true);
     }
   };
 
@@ -100,16 +143,36 @@ const SettingsForm = ({ gym }: SettingsFormParams) => {
             <FormField
               control={form.control}
               name="address"
-              render={({ field }) => (
+              render={() => (
                 <FormItem>
                   <FormLabel>Address</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="123 Main Street, City, Country"
+
+                  {!editingAddress && gym.address ? (
+                    <div className="flex items-center justify-between rounded-md border px-3 py-2 text-sm">
+                      <span className="text-neutral-700">{gym.address}</span>
+
+                      <button
+                        type="button"
+                        onClick={() => setEditingAddress(true)}
+                        className="text-sm font-medium text-blue-600 hover:underline"
+                      >
+                        Change
+                      </button>
+                    </div>
+                  ) : (
+                    <LocationSelect
+                      value={location}
+                      onChange={(val) => {
+                        setLocation(val ?? undefined);
+
+                        form.setValue("address", val?.label ?? "");
+                        form.setValue("country", val?.country ?? "");
+                        form.setValue("latitude", val?.latlng[0] ?? null);
+                        form.setValue("longitude", val?.latlng[1] ?? null);
+                      }}
+                      placeholder="Search gym address"
                     />
-                  </FormControl>
-                  <FormMessage />
+                  )}
                 </FormItem>
               )}
             />
@@ -152,50 +215,11 @@ const SettingsForm = ({ gym }: SettingsFormParams) => {
       </section>
 
       {/* PAYMENTS */}
-      <section className="rounded-xl border bg-white p-6 shadow-sm mt-4">
-        <div className="flex items-start justify-between gap-6">
-          <div>
-            <h3 className="text-lg font-semibold text-neutral-900">Payments</h3>
-            <p className="mt-1 text-sm text-neutral-600 max-w-prose">
-              Connect Stripe to accept drop-in payments. We never see or store
-              your bank details.
-            </p>
-
-            <p className="mt-3 text-sm">
-              Status:{" "}
-              {gym.stripeEnabled ? (
-                <span className="font-medium text-green-600">Connected</span>
-              ) : (
-                <span className="font-medium text-neutral-500">
-                  Not connected
-                </span>
-              )}
-            </p>
-          </div>
-
-          <div className="shrink-0">
-            {gym.stripeEnabled ? (
-              <Button
-                variant="outline"
-                onClick={() => {
-                  window.location.href = "/api/stripe/dashboard";
-                }}
-              >
-                Manage in Stripe
-              </Button>
-            ) : (
-              <Button
-                className="bg-black text-white hover:bg-neutral-800"
-                onClick={() => {
-                  window.location.href = "/api/stripe/connect";
-                }}
-              >
-                Connect Stripe
-              </Button>
-            )}
-          </div>
-        </div>
-      </section>
+      <StripeBox
+        gym={gym}
+        isLoadingStripe={isLoadingStripe}
+        handleCreateAccount={handleCreateAccount}
+      />
     </>
   );
 };

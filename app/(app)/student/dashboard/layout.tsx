@@ -8,9 +8,9 @@ import OptionsPanel from "../../gym/[gymSlug]/admin/components/OptionsPanel";
 import NavbarStudent from "./components/NavbarStudent";
 
 export const metadata: Metadata = {
-  title: "BJJ Desk | Admin Dashboard",
+  title: "BJJ Mat | Student Dashboard",
   description:
-    "BJJ Desk helps Brazilian Jiu-Jitsu gyms manage students, memberships, attendance, and payments — all in one simple platform.",
+    "Manage your training on BJJ Mat — view bookings, track gyms you’ve trained at, update your profile, and drop in anywhere with ease.",
 };
 
 export default async function RootLayout({
