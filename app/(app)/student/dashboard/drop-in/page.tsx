@@ -9,7 +9,7 @@ export default async function StudentDropInPage() {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    redirect("/student");
+    redirect("/login");
   }
 
   // student must be visiting a gym

@@ -5,6 +5,7 @@ import Calendar from "./admin/components/Calendar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { generateTenantURL } from "@/app/lib/utils";
+import GymMap from "../components/Map";
 
 interface IParams {
   gymSlug: string;
@@ -138,6 +139,13 @@ const GymPage = async ({ params }: { params: Promise<IParams> }) => {
                 View on Google Maps
               </a>
             </div>
+            <GymMap
+              center={
+                gym.latitude && gym.longitude
+                  ? [gym.latitude, gym.longitude]
+                  : undefined
+              }
+            />
           </div>
         )}
       </section>

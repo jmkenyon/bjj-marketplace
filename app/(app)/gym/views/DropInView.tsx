@@ -68,6 +68,12 @@ const DropInView = ({ gym, waiver, dropIn, classes }: DropInViewProps) => {
         return;
       }
 
+      if (!gym.stripeAccountId) {
+        toast.error("This gym has not set up payments yet");
+        setIsLoading(false);
+        return;
+      }
+
       // 💳 PAID CLASS → Stripe
       const res = await axios.post("/api/stripe/checkout", {
         amount: dropIn.fee * 100,
@@ -78,11 +84,19 @@ const DropInView = ({ gym, waiver, dropIn, classes }: DropInViewProps) => {
         metadata: {
           gymId: gym.id,
           classId: selectedClass.id,
-          ...data,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          phone: data.phone,
+          sessionDate: data.sessionDate,
         },
       });
 
-      window.location.href = res.data.url;
+      if (res.data?.url) {
+        window.location.href = res.data.url;
+      } else {
+        throw new Error("No checkout URL returned");
+      }
     } catch {
       toast.error("Something went wrong");
     } finally {

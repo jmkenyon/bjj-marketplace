@@ -66,7 +66,7 @@ export default function PaymentsClient({
     } catch {
       toast.error("Failed to connect Stripe");
     } finally {
-      setLoading(true);
+      setLoading(false);
     }
   };
 

@@ -4,10 +4,10 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/(auth)/auth/[...nextauth]/route";
 import { stripe } from "@/lib/stripe";
 import { generateTenantURL } from "@/app/lib/utils";
+import { parseSessionDate } from "@/app/lib/helpers";
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
-
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -21,9 +21,8 @@ export async function POST(req: Request) {
     );
   }
 
-  const parsedDate = new Date(sessionDate);
-
-  if (isNaN(parsedDate.getTime())) {
+  const parsedDate = parseSessionDate(sessionDate);
+  if (!parsedDate) {
     return NextResponse.json(
       { error: "Invalid session date" },
       { status: 400 }
@@ -32,9 +31,7 @@ export async function POST(req: Request) {
 
   const klass = await prisma.class.findUnique({
     where: { id: classId },
-    include: {
-      gym: { include: { dropIn: true } },
-    },
+    include: { gym: { include: { dropIn: true } } },
   });
 
   if (!klass || !klass.gym || !klass.gym.dropIn) {
@@ -44,7 +41,7 @@ export async function POST(req: Request) {
   const gym = klass.gym;
   const dropIn = gym.dropIn;
 
-  // ✅ prevent duplicate booking for SAME class + SAME date
+  // ✅ Prevent duplicate booking (same class + same day)
   const existing = await prisma.accessPass.findFirst({
     where: {
       userId: session.user.id,
@@ -55,12 +52,15 @@ export async function POST(req: Request) {
   });
 
   if (existing) {
-    return NextResponse.json({ error: "Already booked for this date" }, { status: 409 });
+    return NextResponse.json(
+      { error: "Already booked for this date" },
+      { status: 409 }
+    );
   }
 
-  if (!dropIn) { 
+  if (!dropIn) {
     return NextResponse.json(
-      { error: "Drop-ins not available for this gym" },
+      { error: "Drop-in pricing not configured" },
       { status: 400 }
     );
   }
@@ -95,14 +95,17 @@ export async function POST(req: Request) {
   const checkout = await stripe.checkout.sessions.create(
     {
       mode: "payment",
-      payment_method_types: ["card"],
+      metadata: {
+        userId: session.user.id,
+        gymId: gym.id,
+        classId,
+        sessionDate,
+      },
       line_items: [
         {
           price_data: {
             currency: gym.currency.toLowerCase(),
-            product_data: {
-              name: `Drop-in at ${gym.name}`,
-            },
+            product_data: { name: `Drop-in at ${gym.name}` },
             unit_amount: amount,
           },
           quantity: 1,
@@ -110,19 +113,11 @@ export async function POST(req: Request) {
       ],
       payment_intent_data: {
         application_fee_amount: platformFee,
-        metadata: {
-          userId: session.user.id,
-          gymId: gym.id,
-          classId,
-          sessionDate, // ✅ pass through to webhook
-        },
       },
       success_url: `${generateTenantURL(gym.slug)}/success`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/student/dashboard/drop-in`,
     },
-    {
-      stripeAccount: gym.stripeAccountId,
-    }
+    { stripeAccount: gym.stripeAccountId }
   );
 
   return NextResponse.json({ checkoutUrl: checkout.url });
