@@ -103,7 +103,7 @@ const SettingsForm = ({ gym, adminEmail }: SettingsFormParams) => {
     } catch {
       toast.error("Failed to connect Stripe");
     } finally {
-      setIsLoadingStripe(true);
+      setIsLoadingStripe(false);
     }
   };
 

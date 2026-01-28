@@ -22,7 +22,7 @@ export default function PricingPage() {
             Pay as you go
           </p>
           <div className="mt-4 text-5xl font-semibold text-neutral-900">
-            5%
+            10%
           </div>
           <p className="mt-2 text-neutral-600">
             per drop-in booking

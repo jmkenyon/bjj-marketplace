@@ -9,17 +9,20 @@ export default async function PostLogin({
 }: {
   searchParams?: { callbackUrl?: string };
 }) {
+  const resolvedParams = await searchParams
   const session = await getServerSession(authOptions);
 
   if (!session) {
     redirect("/login");
   }
 
-  if (searchParams?.callbackUrl) {
-    redirect(searchParams.callbackUrl);
+  if (resolvedParams?.callbackUrl) {
+    const callbackUrl = resolvedParams.callbackUrl;
+    console.log(callbackUrl)
+    if (callbackUrl.startsWith("/") && !callbackUrl.startsWith("//")) {
+      redirect(callbackUrl);
+    }
   }
-
-
 
   // 🔹 STUDENT / VISITOR → platform dashboard
   if (session.user.role === "VISITOR") {

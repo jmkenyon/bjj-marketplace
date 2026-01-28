@@ -20,8 +20,15 @@ export function DOBPicker({ value, onChange }: DOBPickerProps) {
   const [open, setOpen] = React.useState(false);
 
   // normalize to Date for UI
-  const dateValue =
-    typeof value === "string" ? (value ? new Date(value) : undefined) : value;
+  const dateValue = React.useMemo(() => {
+    if (typeof value === "string") {
+      if (!value) return undefined;
+      // Parse as local date to avoid UTC shift
+      const [year, month, day] = value.split("-").map(Number);
+      return new Date(year, month - 1, day);
+    }
+    return value;
+  }, [value]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

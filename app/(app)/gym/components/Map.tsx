@@ -13,7 +13,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "/leaflet/marker-shadow.png",
 });
 
-interface MapProps {
+interface GymMapProps {
   center?: number[];
 }
 
@@ -23,7 +23,7 @@ function ChangeView({ center }: { center: L.LatLngExpression }) {
   return null;
 }
 
-const Map: React.FC<MapProps> = ({ center }) => {
+const GymMap: React.FC<GymMapProps> = ({ center }) => {
   const defaultCenter: L.LatLngExpression = [-23.55052, -46.633308];
 
   return (
@@ -47,4 +47,4 @@ const Map: React.FC<MapProps> = ({ center }) => {
   );
 };
 
-export default Map;
+export default GymMap;

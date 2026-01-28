@@ -20,7 +20,9 @@ const NavbarDashboard = async ({ gymName, gymSlug }: NavbarDashboardProps) => {
 
   if (isLoggedIn) {
     if (role === "ADMIN" && gymSlugLoggedIn) {
-      dashboardHref = `${generateTenantURL(gymSlugLoggedIn)}/admin/dashboard/information`;
+      dashboardHref = `${generateTenantURL(
+        gymSlugLoggedIn
+      )}/admin/dashboard/information`;
     }
 
     if (role === "VISITOR") {
@@ -40,21 +42,11 @@ const NavbarDashboard = async ({ gymName, gymSlug }: NavbarDashboardProps) => {
             <NavButton className="bg-black text-white">Dashboard</NavButton>
           </Link>
         ) : (
-          <>
-            <Link href={`${generateTenantURL(gymSlug)}/student`}>
-              <NavButton className="bg-white text-neutral-900 hover:bg-neutral-100 hover:text-neutral-900">
-                <span className="hidden sm:inline">Student login</span>
-                <span className="sm:hidden">Student</span>
-              </NavButton>
-            </Link>
-
-            <Link href={`${generateTenantURL(gymSlug)}/admin`}>
-              <NavButton className="bg-black text-white hover:bg-neutral-800">
-                <span className="hidden sm:inline">Admin login</span>
-                <span className="sm:hidden">Admin</span>
-              </NavButton>
-            </Link>
-          </>
+          <Link href={`/login`}>
+            <NavButton className="bg-black text-white hover:bg-black/90">
+              <span >Login</span>
+            </NavButton>
+          </Link>
         )}
       </div>
     </nav>

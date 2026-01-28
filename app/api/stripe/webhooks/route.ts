@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import prisma from "@/app/lib/prisma";
 import { stripe } from "@/lib/stripe";
+import { parseSessionDate } from "@/app/lib/helpers";
 
 export async function POST(req: Request) {
   const sig = req.headers.get("stripe-signature");
@@ -45,6 +46,10 @@ export async function POST(req: Request) {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
 
+    if (session.payment_status !== "paid") {
+      return NextResponse.json({ received: true });
+    }
+
     if (!session.payment_intent || !session.metadata) {
       return NextResponse.json({ received: true });
     }
@@ -52,7 +57,8 @@ export async function POST(req: Request) {
     const { gymId, classId, userId, email, sessionDate, firstName, lastName } =
       session.metadata;
 
-    const parsedSessionDate = sessionDate ? new Date(sessionDate) : null;
+      const parsedSessionDate = parseSessionDate(sessionDate);
+
 
     if (!parsedSessionDate || isNaN(parsedSessionDate.getTime())) {
       console.warn("Invalid or missing sessionDate");

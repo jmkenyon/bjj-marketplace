@@ -13,7 +13,7 @@ export async function GET() {
 
   const gym = await prisma.gym.findUnique({
     where: { id: session.user.gymId },
-    select: { stripeAccountId: true },
+    select: { stripeAccountId: true, stripeEnabled: true },
   });
 
   if (!gym?.stripeAccountId) {
@@ -26,10 +26,10 @@ export async function GET() {
     account.charges_enabled === true &&
     account.payouts_enabled === true;
 
-  if (isEnabled) {
+    if (gym.stripeEnabled !== isEnabled) {
     await prisma.gym.update({
       where: { id: session.user.gymId },
-      data: { stripeEnabled: true },
+      data: { stripeEnabled: isEnabled },
     });
   }
 

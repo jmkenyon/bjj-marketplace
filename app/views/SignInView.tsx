@@ -124,6 +124,15 @@ export const SignInView = () => {
               )}
             />
 
+            <div className="flex justify-end">
+              <Link
+                href="/forgot-password"
+                className="text-sm text-neutral-600 hover:text-neutral-900 underline"
+              >
+                Forgot your password?
+              </Link>
+            </div>
+
             {/* CTA */}
             <Button
               disabled={isLoading}
