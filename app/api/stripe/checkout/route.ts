@@ -1,42 +1,44 @@
 // app/api/stripe/checkout/route.ts
 import { NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
-import Stripe from "stripe";
 import prisma from "@/app/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/(auth)/auth/[...nextauth]/route";
-import { generateTenantURL } from "@/app/lib/utils";
+import Stripe from "stripe";
 import crypto from "crypto";
+import { generateTenantURL } from "@/app/lib/utils";
+import { parseSessionDate } from "@/app/lib/helpers";
 
 interface CheckoutBody {
-  gymId: string;
   classId: string;
-  sessionDate?: string; // ISO string
+  sessionDate: string; // YYYY-MM-DD
+  email?: string;
+  firstName?: string;
+  lastName?: string;
 }
 
 export async function POST(req: Request) {
   try {
-    /* -------------------------
-       AUTH
-    -------------------------- */
-    const session = await getServerSession(authOptions);
+    const body = (await req.json()) as CheckoutBody;
+    const { classId, sessionDate, email, firstName, lastName } = body;
 
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!classId || !sessionDate) {
+      return NextResponse.json(
+        { error: "classId and sessionDate are required" },
+        { status: 400 }
+      );
     }
 
-    const body = (await req.json()) as CheckoutBody;
-    const { gymId, classId, sessionDate } = body;
-
-    if (!gymId || !classId) {
+    const parsedDate = parseSessionDate(sessionDate);
+    if (!parsedDate) {
+      console.log("session date");
       return NextResponse.json(
-        { error: "gymId and classId are required" },
+        { error: "Invalid session date" },
+
         { status: 400 }
       );
     }
 
     /* -------------------------
-       LOAD GYM + PRICING
+       LOAD CLASS + GYM
     -------------------------- */
     const klass = await prisma.class.findUnique({
       where: { id: classId },
@@ -47,20 +49,37 @@ export async function POST(req: Request) {
       },
     });
 
-    if (!klass || klass.gymId !== gymId) {
-      return NextResponse.json({ error: "Invalid class" }, { status: 400 });
+    if (!klass || !klass.gym || !klass.gym.dropIn) {
+      return NextResponse.json(
+        { error: "Invalid class or drop-ins unavailable" },
+        { status: 400 }
+      );
     }
 
     const gym = klass.gym;
     const dropIn = gym.dropIn;
 
-    if (!dropIn || dropIn.fee <= 0) {
+    /* -------------------------
+       FREE CLASS → NO STRIPE
+
+    -------------------------- */
+    if (!dropIn) {
       return NextResponse.json(
-        { error: "This class does not require payment" },
+        { error: "Drop-ins are not available for this gym" },
         { status: 400 }
       );
     }
 
+    if (klass.isFree || dropIn.fee === 0) {
+      return NextResponse.json({
+        free: true,
+        message: "Free drop-in – no payment required",
+      });
+    }
+
+    /* -------------------------
+       STRIPE CONFIG CHECK
+    -------------------------- */
     if (!gym.stripeAccountId) {
       return NextResponse.json(
         { error: "Gym is not configured for payments" },
@@ -69,27 +88,7 @@ export async function POST(req: Request) {
     }
 
     /* -------------------------
-       PREVENT DUPLICATES
-    -------------------------- */
-    const existing = await prisma.accessPass.findFirst({
-      where: {
-        userId: session.user.id,
-        gymId,
-        classId,
-        sessionDate: sessionDate ? new Date(sessionDate) : undefined,
-        status: "ACTIVE",
-      },
-    });
-
-    if (existing) {
-      return NextResponse.json(
-        { error: "You are already booked for this session" },
-        { status: 409 }
-      );
-    }
-
-    /* -------------------------
-       DERIVED PAYMENT DATA
+       PAYMENT CALCULATION
     -------------------------- */
     const amount = Math.round(dropIn.fee * 100);
     const platformFee = Math.round(amount * 0.1);
@@ -100,9 +99,7 @@ export async function POST(req: Request) {
     -------------------------- */
     const idempotencyKey = crypto
       .createHash("sha256")
-      .update(
-        `${session.user.id}:${gymId}:${classId}:${sessionDate ?? "na"}`
-      )
+      .update(`${classId}:${sessionDate}:${email ?? "guest"}`)
       .digest("hex");
 
     /* -------------------------
@@ -112,6 +109,7 @@ export async function POST(req: Request) {
       {
         mode: "payment",
         payment_method_types: ["card"],
+
         line_items: [
           {
             price_data: {
@@ -124,27 +122,37 @@ export async function POST(req: Request) {
             quantity: 1,
           },
         ],
+
+        // 🔑 SESSION-LEVEL METADATA (WEBHOOK READS THIS)
+        metadata: {
+          intent: "DROP_IN",
+          gymId: gym.id,
+          classId,
+          sessionDate,
+          email: email ?? "",
+          firstName: firstName ?? "",
+          lastName: lastName ?? "",
+        },
+
         payment_intent_data: {
           application_fee_amount: platformFee,
-          metadata: {
-            intent: "DROP_IN",
-            userId: session.user.id,
-            gymId,
-            classId,
-            sessionDate: sessionDate ?? "",
-          },
         },
+
         success_url: `${generateTenantURL(gym.slug)}/success`,
-        cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/student/dashboard/drop-in?gymId=${gymId}`,
+        cancel_url: `${generateTenantURL(gym.slug)}/drop-in`,
       },
       {
-        stripeAccount: gym.stripeAccountId, // ✅ direct charge
+        stripeAccount: gym.stripeAccountId,
         idempotencyKey,
       }
     );
 
-    return NextResponse.json({ url: checkoutSession.url });
+    return NextResponse.json({
+      url: checkoutSession.url,
+    });
   } catch (err) {
+    console.error("[STRIPE_CHECKOUT_ERROR]", err);
+
     if (err instanceof Stripe.errors.StripeError) {
       return NextResponse.json(
         { error: err.message },
@@ -152,7 +160,6 @@ export async function POST(req: Request) {
       );
     }
 
-    console.error("[STRIPE_CHECKOUT_ERROR]", err);
     return NextResponse.json(
       { error: "Failed to create checkout session" },
       { status: 500 }

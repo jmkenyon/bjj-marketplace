@@ -141,7 +141,7 @@ const GymPage = async ({ params }: { params: Promise<IParams> }) => {
             </div>
             <GymMap
               center={
-                gym.latitude && gym.longitude
+                gym.latitude != null && gym.longitude != null
                   ? [gym.latitude, gym.longitude]
                   : undefined
               }

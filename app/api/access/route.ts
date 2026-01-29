@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
-import { sendDropInConfirmationEmail } from "@/lib/email";
+import {
+  sendDropInConfirmationEmail,
+  sendGymDropInNotificationEmail,
+} from "@/lib/email";
 import crypto from "crypto";
+import { parseSessionDate } from "@/app/lib/helpers";
 
 export async function POST(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -13,7 +17,7 @@ export async function POST(req: Request) {
 
   const gym = await prisma.gym.findUnique({
     where: { slug: gymSlug },
-    include: { waiver: true },
+    include: { waiver: true, dropIn: true },
   });
 
   if (!gym) {
@@ -32,11 +36,18 @@ export async function POST(req: Request) {
     classId,
   } = await req.json();
 
-  const newSessionDate = new Date(sessionDate);
-
-  if (!classId) {
+  if (!classId || !sessionDate) {
     return NextResponse.json(
-      { error: "Class selection is required" },
+      { error: "Class and session date are required" },
+      { status: 400 }
+    );
+  }
+
+  const parsedSessionDate = parseSessionDate(sessionDate);
+
+  if (!parsedSessionDate) {
+    return NextResponse.json(
+      { error: "Invalid session date" },
       { status: 400 }
     );
   }
@@ -53,7 +64,6 @@ export async function POST(req: Request) {
   }
 
   const normalizedEmail = email?.toLowerCase().trim();
-
   if (!normalizedEmail) {
     return NextResponse.json({ error: "Email is required" }, { status: 400 });
   }
@@ -66,6 +76,9 @@ export async function POST(req: Request) {
   }
 
   try {
+    /* -------------------------
+       USER RESOLUTION
+    -------------------------- */
     let user = await prisma.user.findFirst({
       where: {
         email: normalizedEmail,
@@ -88,22 +101,29 @@ export async function POST(req: Request) {
       });
     }
 
-    // Prevent duplicate booking for same class
+    /* -------------------------
+       DUPLICATE CHECK (DATE-SAFE)
+    -------------------------- */
     const existingPass = await prisma.accessPass.findFirst({
       where: {
         userId: user.id,
         gymId: gym.id,
         classId,
-        status: "ACTIVE",
+        sessionDate: parsedSessionDate,
       },
     });
 
     if (existingPass) {
       return NextResponse.json(
-        { error: "You are already booked for this class" },
+        { error: "You are already booked for this session" },
         { status: 409 }
       );
     }
+
+    /* -------------------------
+       CREATE ACCESS PASS
+    -------------------------- */
+    const isPaid = selectedClass.isFree || gym.dropIn?.fee === 0;
 
     await prisma.accessPass.create({
       data: {
@@ -111,12 +131,14 @@ export async function POST(req: Request) {
         userId: user.id,
         gymId: gym.id,
         classId,
-        sessionDate: newSessionDate,
-        isPaid: selectedClass.isFree, // free classes auto-paid
+        sessionDate: parsedSessionDate,
+        isPaid,
       },
     });
 
-    // Save waiver once per user
+    /* -------------------------
+       SAVE WAIVER (ONCE)
+    -------------------------- */
     if (gym.waiver) {
       const alreadySigned = await prisma.signedWaiver.findFirst({
         where: {
@@ -137,6 +159,10 @@ export async function POST(req: Request) {
         });
       }
     }
+
+    /* -------------------------
+       PASSWORD TOKEN (OPTIONAL)
+    -------------------------- */
     let token: string | undefined;
 
     if (!user.hashedPassword) {
@@ -151,13 +177,40 @@ export async function POST(req: Request) {
       });
     }
 
+    /* -------------------------
+       EMAILS
+    -------------------------- */
+    const formattedDate = `${selectedClass.dayOfWeek} at ${selectedClass.startTime} (${sessionDate})`;
+
     await sendDropInConfirmationEmail({
       to: user.email,
       gymName: gym.name,
       classTitle: selectedClass.title,
-      date: `${selectedClass.dayOfWeek} at ${selectedClass.startTime}`,
-      token, // undefined for existing users
+      date: formattedDate,
+      token,
     });
+
+    const gymOwner = await prisma.user.findFirst({
+      where: {
+        gymId: gym.id,
+        role: "ADMIN",
+      },
+      select: {
+        email: true,
+      },
+    });
+    if (gymOwner?.email) {
+      await sendGymDropInNotificationEmail({
+        to: gymOwner.email,
+        gymName: gym.name,
+        classTitle: selectedClass.title,
+        date: formattedDate,
+        studentName:
+          `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() || "Guest",
+        studentEmail: user.email,
+        isPaid,
+      });
+    }
 
     return NextResponse.json({ success: true }, { status: 201 });
   } catch (error) {

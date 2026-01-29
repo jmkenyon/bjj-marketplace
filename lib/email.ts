@@ -81,7 +81,6 @@ export async function sendDropInConfirmationEmail({
   console.log({ data });
 }
 
-
 export async function sendPasswordResetEmail({
   to,
   token,
@@ -89,7 +88,9 @@ export async function sendPasswordResetEmail({
   to: string;
   token: string;
 }) {
-  const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`;
+  const resetUrl = `${
+    process.env.NEXT_PUBLIC_APP_URL
+  }/reset-password?token=${encodeURIComponent(token)}`;
 
   const { data, error } = await resend.emails.send({
     from: "BJJ Mat <noreply@bjjmat.io>",
@@ -144,5 +145,91 @@ export async function sendPasswordResetEmail({
     throw new Error("Email send failed");
   }
 
-  console.log("Password reset email sent", data);
+  if (process.env.NODE_ENV !== "production") {
+    console.log("Password reset email sent", { id: data?.id });
+  }
+}
+
+
+export async function sendGymDropInNotificationEmail({
+  to,
+  gymName,
+  classTitle,
+  date,
+  studentName,
+  studentEmail,
+  isPaid,
+}: {
+  to: string;
+  gymName: string;
+  classTitle: string;
+  date: string;
+  studentName: string;
+  studentEmail: string;
+  isPaid: boolean;
+}) {
+  const { data, error } = await resend.emails.send({
+    from: "BJJ Mat <noreply@bjjmat.io>",
+    to,
+    subject: `New drop-in booked at ${gymName}`,
+    text: `
+New drop-in booking
+
+Gym: ${gymName}
+Class: ${classTitle}
+Date: ${date}
+
+Student: ${studentName}
+Email: ${studentEmail}
+
+Payment: ${isPaid ? "PAID" : "FREE"}
+`,
+    html: `
+      <div style="font-family: Inter, system-ui, -apple-system, sans-serif; background:#f5f5f5; padding:40px;">
+        <div style="max-width:560px; margin:0 auto; background:#ffffff; border-radius:12px; padding:32px;">
+          
+          <h1 style="margin-top:0;">New drop-in booked 🥋</h1>
+
+          <p style="font-size:15px; color:#555;">
+            A new drop-in has been booked at <strong>${gymName}</strong>.
+          </p>
+
+          <div style="margin:24px 0; font-size:15px;">
+            <strong>Class</strong><br/>
+            ${classTitle}<br/>
+            <span style="color:#555;">${date}</span>
+          </div>
+
+          <div style="margin:24px 0; font-size:15px;">
+            <strong>Student</strong><br/>
+            ${studentName}<br/>
+            <a href="mailto:${studentEmail}" style="color:#2563eb; text-decoration:none;">
+              ${studentEmail}
+            </a>
+          </div>
+
+          <div style="margin:24px 0; font-size:15px;">
+            <strong>Payment</strong><br/>
+            ${isPaid ? "✅ Paid" : "🆓 Free"}
+          </div>
+
+          <hr style="margin:32px 0;" />
+
+          <p style="font-size:14px;">
+            Manage bookings in your dashboard.<br/>
+            <strong>BJJ Mat</strong>
+          </p>
+        </div>
+      </div>
+    `,
+  });
+
+  if (error) {
+    console.error("Failed to send gym notification email", error);
+    return;
+  }
+
+  if (process.env.NODE_ENV !== "production") {
+    console.log("Gym drop-in notification sent", { id: data?.id });
+  }
 }
