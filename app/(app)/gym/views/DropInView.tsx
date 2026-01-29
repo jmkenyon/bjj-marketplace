@@ -81,6 +81,10 @@ const DropInView = ({ gym, waiver, dropIn, classes }: DropInViewProps) => {
         gymStripeAccountId: gym.stripeAccountId,
         successUrl: `${generateTenantURL(gym.slug)}/success`,
         cancelUrl: window.location.href,
+        sessionDate: data.sessionDate,
+        classId: selectedClass.id,
+        
+
         metadata: {
           gymId: gym.id,
           classId: selectedClass.id,

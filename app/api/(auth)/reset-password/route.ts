@@ -3,7 +3,16 @@ import prisma from "@/app/lib/prisma";
 import bcrypt from "bcrypt";
 
 export async function POST(req: Request) {
-  const { token, password } = await req.json();
+  const body = await req.json();
+  const token = typeof body?.token === "string" ? body.token : "";
+  const password = typeof body?.password === "string" ? body.password : "";
+
+  if (!token || !password) {
+    return NextResponse.json(
+      { error: "Token and password are required" },
+      { status: 400 }
+    );
+  }
 
   const reset = await prisma.passwordToken.findUnique({
     where: { token },
@@ -19,14 +28,15 @@ export async function POST(req: Request) {
 
   const hashedPassword = await bcrypt.hash(password, 12);
 
-  await prisma.user.update({
-    where: { id: reset.userId },
-    data: { hashedPassword },
-  });
-
-  await prisma.passwordToken.delete({
-    where: { id: reset.id },
-  });
+  await prisma.$transaction([
+    prisma.user.update({
+      where: { id: reset.userId },
+      data: { hashedPassword },
+    }),
+    prisma.passwordToken.delete({
+      where: { id: reset.id },
+    }),
+  ]);
 
   return NextResponse.json({ success: true });
 }

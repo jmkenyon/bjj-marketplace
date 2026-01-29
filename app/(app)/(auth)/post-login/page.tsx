@@ -9,7 +9,7 @@ export default async function PostLogin({
 }: {
   searchParams?: { callbackUrl?: string };
 }) {
-  const resolvedParams = await searchParams
+  const resolvedParams = await searchParams;
   const session = await getServerSession(authOptions);
 
   if (!session) {
@@ -18,8 +18,11 @@ export default async function PostLogin({
 
   if (resolvedParams?.callbackUrl) {
     const callbackUrl = resolvedParams.callbackUrl;
-    console.log(callbackUrl)
-    if (callbackUrl.startsWith("/") && !callbackUrl.startsWith("//")) {
+    if (
+      typeof callbackUrl === "string" &&
+      callbackUrl.startsWith("/") &&
+      !callbackUrl.startsWith("//")
+    ) {
       redirect(callbackUrl);
     }
   }
