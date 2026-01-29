@@ -29,7 +29,6 @@ export async function POST(req: Request) {
 
     const parsedDate = parseSessionDate(sessionDate);
     if (!parsedDate) {
-      console.log("session date");
       return NextResponse.json(
         { error: "Invalid session date" },
 
@@ -99,9 +98,18 @@ export async function POST(req: Request) {
     -------------------------- */
     const idempotencyKey = crypto
       .createHash("sha256")
-      .update(`${classId}:${sessionDate}:${email ?? "guest"}`)
+      .update(
+        [
+          "dropin",
+          gym.stripeAccountId, // 🔑 connect scope
+          classId,
+          sessionDate,
+          email ?? "",
+          firstName ?? "",
+          lastName ?? "",
+        ].join(":")
+      )
       .digest("hex");
-
     /* -------------------------
        STRIPE CHECKOUT
     -------------------------- */

@@ -123,7 +123,14 @@ export async function POST(req: Request) {
     /* -------------------------
        CREATE ACCESS PASS
     -------------------------- */
-    const isPaid = selectedClass.isFree || gym.dropIn?.fee === 0;
+    const isFreeDropIn = selectedClass.isFree || gym.dropIn?.fee === 0;
+    if (!isFreeDropIn) {
+      return NextResponse.json(
+        { error: "Payment required for this drop-in" },
+        { status: 402 }
+      );
+    }
+    const isPaid = isFreeDropIn;
 
     await prisma.accessPass.create({
       data: {
