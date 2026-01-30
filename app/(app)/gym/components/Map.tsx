@@ -26,6 +26,9 @@ function ChangeView({ center }: { center: L.LatLngExpression }) {
 const GymMap: React.FC<GymMapProps> = ({ center }) => {
   const defaultCenter: L.LatLngExpression = [-23.55052, -46.633308];
 
+  console.log(center ?? "hello")
+
+
   return (
     <MapContainer
       center={(center as L.LatLngExpression) || defaultCenter}
