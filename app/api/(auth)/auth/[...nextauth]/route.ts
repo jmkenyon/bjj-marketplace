@@ -65,16 +65,18 @@ export const authOptions: AuthOptions = {
 
   secret: process.env.NEXTAUTH_SECRET,
 
-
   cookies: {
     sessionToken: {
-      name: "bjjmat-token",
+      name:
+        process.env.NODE_ENV === "production"
+          ? "__Secure-bjjmat-token"
+          : "bjjmat-token",
       options: {
         httpOnly: true,
         sameSite: "lax",
         path: "/",
         secure: process.env.NODE_ENV === "production",
-        domain: `.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, 
+        domain: `.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`,
       },
     },
   },
@@ -101,7 +103,7 @@ export const authOptions: AuthOptions = {
       if (session.user) {
         session.user.id = token.userId as string;
         session.user.role = token.role as "VISITOR" | "ADMIN";
-        session.user.gymId = token.gymId as string  | undefined;
+        session.user.gymId = token.gymId as string | undefined;
         session.user.gymSlug = token.gymSlug as string | null;
       }
       return session;
