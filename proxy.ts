@@ -21,10 +21,13 @@ export default async function proxy(req: NextRequest) {
     ? hostname.replace(`.${rootDomain}`, "")
     : null;
 
+
   const token = await getToken({
     req,
     secret: process.env.NEXTAUTH_SECRET,
   });
+
+  console.log(token)
 
   /* -----------------------------
      STUDENT DASHBOARD (ROOT ONLY)
@@ -68,8 +71,10 @@ export default async function proxy(req: NextRequest) {
      ADMIN DASHBOARD (ADMIN ONLY)
   ------------------------------ */
   if (pathname.startsWith("/admin/dashboard")) {
+
+    // this is the issue
     if (!token) {
-      return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_APP_URL}/login1`, req.url));
+      return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_APP_URL}/login`, req.url));
     }
 
     if (token.role !== "ADMIN") {
@@ -77,7 +82,7 @@ export default async function proxy(req: NextRequest) {
     }
 
     if (!isTenantDomain || token.gymSlug !== gymSlug) {
-      return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_APP_URL}/login2`, req.url));
+      return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_APP_URL}/login`, req.url));
     }
   }
 
