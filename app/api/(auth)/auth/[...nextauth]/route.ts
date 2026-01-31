@@ -56,7 +56,7 @@ export const authOptions: AuthOptions = {
   ],
 
   pages: {
-    signIn: "/login",
+    signIn: `${process.env.NEXT_PUBLIC_APP_URL}/login`,
   },
 
   session: {

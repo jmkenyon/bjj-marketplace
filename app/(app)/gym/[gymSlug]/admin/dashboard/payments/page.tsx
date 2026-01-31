@@ -9,7 +9,7 @@ export default async function PaymentsPage() {
   const session = await getServerSession(authOptions);
 
   if (!session || session.user.role !== "ADMIN" || !session.user.gymId) {
-    redirect("/login");
+    redirect(`${process.env.NEXT_PUBLIC_APP_URL}/login`);
   }
 
   const gym = await prisma.gym.findUnique({
@@ -18,7 +18,7 @@ export default async function PaymentsPage() {
   });
 
   if (!gym) {
-    redirect("/login");
+    redirect(`${process.env.NEXT_PUBLIC_APP_URL}/login`);
   }
 
   return (

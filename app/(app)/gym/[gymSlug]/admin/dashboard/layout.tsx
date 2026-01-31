@@ -24,14 +24,14 @@ export default async function RootLayout({ children, params }: LayoutProps) {
   const { gymSlug } = await params;
 
   const session = await getServerSession(authOptions);
-  if (!session) redirect("/login");
+  if (!session) redirect(`${process.env.NEXT_PUBLIC_APP_URL}/login`);
 
   const gym = await prisma.gym.findUnique({
     where: { slug: gymSlug },
   });
 
   if (!gym || session.user.gymId !== gym.id) {
-    redirect("/login");
+    redirect(`${process.env.NEXT_PUBLIC_APP_URL}/login`);
   }
 
   return (

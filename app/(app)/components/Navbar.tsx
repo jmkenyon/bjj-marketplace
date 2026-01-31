@@ -52,7 +52,7 @@ const Navbar = async () => {
           </Link>
         ) : (
           <>
-            <Link href="/login">
+            <Link href={`${process.env.NEXT_PUBLIC_APP_URL}/login`}>
               <NavButton className="bg-white text-black">
                 Login
               </NavButton>

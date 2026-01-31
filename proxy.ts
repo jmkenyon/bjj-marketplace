@@ -5,6 +5,8 @@ export const config = {
   matcher: ["/((?!api/|_next/|_static/|_vercel|media/|[\\w-]+\\.\\w+).*)"],
 };
 
+
+
 export default async function proxy(req: NextRequest) {
   const hostname = req.headers.get("host");
   const pathname = req.nextUrl.pathname;
@@ -67,7 +69,7 @@ export default async function proxy(req: NextRequest) {
   ------------------------------ */
   if (pathname.startsWith("/admin/dashboard")) {
     if (!token) {
-      return NextResponse.redirect(new URL("/login", req.url));
+      return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_APP_URL}/login`, req.url));
     }
 
     if (token.role !== "ADMIN") {
@@ -75,7 +77,7 @@ export default async function proxy(req: NextRequest) {
     }
 
     if (!isTenantDomain || token.gymSlug !== gymSlug) {
-      return NextResponse.redirect(new URL("/login", req.url));
+      return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_APP_URL}/login`, req.url));
     }
   }
 
