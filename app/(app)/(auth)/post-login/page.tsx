@@ -13,7 +13,7 @@ export default async function PostLogin({
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    redirect("/login");
+    redirect(`${process.env.NEXT_PUBLIC_APP_URL}/login`);
   }
 
   if (resolvedParams?.callbackUrl) {
