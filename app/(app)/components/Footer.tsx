@@ -7,7 +7,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div className="space-y-3">
-            <Link href="/" className="text-lg font-semibold">
+            <Link href={process.env.NEXT_PUBLIC_APP_URL ?? "https://bjjmat.io"} className="text-lg font-semibold cursor-pointer">
               BJJ Mat
             </Link>
             <p className="text-sm text-neutral-600">
