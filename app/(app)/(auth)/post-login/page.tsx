@@ -13,7 +13,7 @@ export default async function PostLogin({
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    redirect(`${process.env.NEXT_PUBLIC_APP_URL}/login`);
+    redirect(`${process.env.NEXT_PUBLIC_APP_URL}/login3`);
   }
 
   if (resolvedParams?.callbackUrl) {
@@ -34,7 +34,7 @@ export default async function PostLogin({
 
   // 🔹 ADMIN → gym tenant dashboard
   if (!session.user.gymId) {
-    redirect(`${process.env.NEXT_PUBLIC_APP_URL}/login`);
+    redirect(`${process.env.NEXT_PUBLIC_APP_URL}/login4`);
   }
 
   const gym = await prisma.gym.findUnique({
@@ -43,7 +43,7 @@ export default async function PostLogin({
   });
 
   if (!gym) {
-    redirect(`${process.env.NEXT_PUBLIC_APP_URL}/login`);
+    redirect(`${process.env.NEXT_PUBLIC_APP_URL}/login5`);
   }
 
   redirect(`${generateTenantURL(gym.slug)}/admin/dashboard/information`);
