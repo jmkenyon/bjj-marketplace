@@ -69,7 +69,7 @@ export default async function proxy(req: NextRequest) {
   ------------------------------ */
   if (pathname.startsWith("/admin/dashboard")) {
     if (!token) {
-      return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_APP_URL}/login`, req.url));
+      return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_APP_URL}/login1`, req.url));
     }
 
     if (token.role !== "ADMIN") {
@@ -77,7 +77,7 @@ export default async function proxy(req: NextRequest) {
     }
 
     if (!isTenantDomain || token.gymSlug !== gymSlug) {
-      return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_APP_URL}/login`, req.url));
+      return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_APP_URL}/login2`, req.url));
     }
   }
 
