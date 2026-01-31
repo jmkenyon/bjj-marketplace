@@ -42,7 +42,7 @@ const NavbarDashboard = async ({ gymName, gymSlug }: NavbarDashboardProps) => {
             <NavButton className="bg-black text-white">Dashboard</NavButton>
           </Link>
         ) : (
-          <Link href={`/login`}>
+          <Link href={`${process.env.NEXT_PUBLIC_APP_URL}/login`}>
             <NavButton className="bg-black text-white hover:bg-black/90">
               <span >Login</span>
             </NavButton>
