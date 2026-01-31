@@ -27,7 +27,7 @@ export default async function proxy(req: NextRequest) {
     secret: process.env.NEXTAUTH_SECRET,
   });
 
-  console.log(token)
+
 
   /* -----------------------------
      STUDENT DASHBOARD (ROOT ONLY)
@@ -72,7 +72,7 @@ export default async function proxy(req: NextRequest) {
   ------------------------------ */
   if (pathname.startsWith("/admin/dashboard")) {
 
-    // this is the issue
+
     if (!token) {
       return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_APP_URL}/login`, req.url));
     }

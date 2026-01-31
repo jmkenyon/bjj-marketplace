@@ -65,6 +65,20 @@ export const authOptions: AuthOptions = {
 
   secret: process.env.NEXTAUTH_SECRET,
 
+
+  cookies: {
+    sessionToken: {
+      name: "bjjmat-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+        domain: `.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, 
+      },
+    },
+  },
+
   callbacks: {
     async jwt({ token, user }) {
       if (user && typeof user === "object" && "role" in user) {
