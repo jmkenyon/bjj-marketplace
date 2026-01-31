@@ -55,6 +55,19 @@ export const authOptions: AuthOptions = {
     }),
   ],
 
+  cookies: {
+    sessionToken: {
+      name: "__Secure-next-auth.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: true,
+        domain: ".bjjmat.io",
+      },
+    },
+  },
+
   pages: {
     signIn: `${process.env.NEXT_PUBLIC_APP_URL}/login`,
   },
@@ -64,22 +77,6 @@ export const authOptions: AuthOptions = {
   },
 
   secret: process.env.NEXTAUTH_SECRET,
-
-  cookies: {
-    sessionToken: {
-      name:
-        process.env.NODE_ENV === "production"
-          ? "__Secure-bjjmat-token"
-          : "bjjmat-token",
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: process.env.NODE_ENV === "production",
-        domain: `.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`,
-      },
-    },
-  },
 
   callbacks: {
     async jwt({ token, user }) {

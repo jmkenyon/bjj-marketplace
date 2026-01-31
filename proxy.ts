@@ -27,6 +27,8 @@ export default async function proxy(req: NextRequest) {
     secret: process.env.NEXTAUTH_SECRET,
   });
 
+  console.log(token)
+
 
 
   /* -----------------------------
@@ -57,7 +59,7 @@ export default async function proxy(req: NextRequest) {
     }
 
     if (!token) {
-      return NextResponse.rewrite(new URL(`/gym/${gymSlug}/admin`, req.url));
+      return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_APP_URL}`, req.url));
     }
 
     if (token.role === "ADMIN") {
@@ -72,9 +74,10 @@ export default async function proxy(req: NextRequest) {
   ------------------------------ */
   if (pathname.startsWith("/admin/dashboard")) {
 
-
+    /// this is the problem
+    
     if (!token) {
-      return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_APP_URL}/login1`, req.url));
+      return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_APP_URL}/login`, req.url));
     }
 
     if (token.role !== "ADMIN") {
@@ -82,7 +85,7 @@ export default async function proxy(req: NextRequest) {
     }
 
     if (!isTenantDomain || token.gymSlug !== gymSlug) {
-      return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_APP_URL}/login2`, req.url));
+      return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_APP_URL}/login`, req.url));
     }
   }
 
