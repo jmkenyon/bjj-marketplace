@@ -53,8 +53,8 @@ export const SignInView = () => {
         toast.success("Welcome back");
         router.push(
           callbackUrl
-            ? `/post-login?callbackUrl=${encodeURIComponent(callbackUrl)}`
-            : "/post-login"
+            ? `${process.env.NEXT_PUBLIC_APP_URL}/post-login?callbackUrl=${encodeURIComponent(callbackUrl)}`
+            : `${process.env.NEXT_PUBLIC_APP_URL}/post-login`
         );
       } else {
         toast.error("Invalid email or password");

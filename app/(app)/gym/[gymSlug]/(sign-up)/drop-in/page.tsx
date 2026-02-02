@@ -88,7 +88,7 @@ const DropInPage = async ({ params }: { params: Promise<IParams> }) => {
             className="mt-4 bg-neutral-900 text-white hover:bg-neutral-800"
           >
             <Link
-              href={`${process.env.NEXT_PUBLIC_APP_UR}/login?callbackUrl=${encodeURIComponent(
+              href={`${process.env.NEXT_PUBLIC_APP_URL}/login?callbackUrl=${encodeURIComponent(
                 `/student/dashboard/drop-in?gymId=${gym.id}`
               )}`}
             >
